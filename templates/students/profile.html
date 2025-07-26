@@ -1,0 +1,70 @@
+{% extends 'base/base.html' %}
+
+{% block title %}My Profile - University Module Registration System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card profile-card">
+                <div class="card-body text-center">
+                    {% if user.student.photo %}
+                        <img src="{{ user.student.photo.url }}" alt="{{ user.get_full_name }}" class="profile-photo rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                            <i class="fas fa-user fa-4x text-white"></i>
+                        </div>
+                    {% endif %}
+                    <h3>{{ user.get_full_name|default:user.username }}</h3>
+                    <p class="text-muted">{{ user.email }}</p>
+                    <hr>
+                    <div class="row text-start">
+                        {% if user.student %}
+                        <div class="col-md-6 mb-3">
+                            <strong>Student ID:</strong><br>
+                            {{ user.student.student_id }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Date of Birth:</strong><br>
+                            {{ user.student.date_of_birth|date:'M d, Y'|default:'Not provided' }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Phone:</strong><br>
+                            {{ user.student.phone|default:'Not provided' }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Address:</strong><br>
+                            {{ user.student.address|default:'Not provided' }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>City:</strong><br>
+                            {{ user.student.city|default:'Not provided' }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Country:</strong><br>
+                            {{ user.student.country|default:'Not provided' }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Email Verified:</strong><br>
+                            {% if user.student.is_email_verified %}
+                                <span class="badge bg-success">Verified</span>
+                            {% else %}
+                                <span class="badge bg-danger">Not Verified</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="d-grid gap-2 mt-4">
+                        <a href="{% url 'students:profile_edit' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit me-2"></i>Edit Profile
+                        </a>
+                        <a href="{% url 'students:dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

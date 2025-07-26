@@ -1,0 +1,149 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Dashboard - University Module Registration System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    {% if student %}
+    <div class="row">
+        <div class="col-lg-4">
+            <!-- Profile Card -->
+            <div class="card dashboard-card profile-card">
+                <div class="card-body text-center">
+                    {% if student.photo %}
+                        <img src="{{ student.photo.url }}" alt="{{ student.full_name }}" class="profile-photo rounded-circle mb-3">
+                    {% else %}
+                        <div class="bg-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center profile-photo">
+                            <i class="fas fa-user fa-4x text-white"></i>
+                        </div>
+                    {% endif %}
+                    <h4>{{ student.full_name }}</h4>
+                    <p class="text-muted">{{ user.email }}</p>
+                    <p><i class="fas fa-map-marker-alt me-2"></i>{{ student.city }}, {{ student.country }}</p>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'students:profile' %}" class="btn btn-primary">
+                            <i class="fas fa-user me-2"></i>View Profile
+                        </a>
+                        <a href="{% url 'students:profile_edit' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit me-2"></i>Edit Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <!-- Quick Stats -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card dashboard-card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-book dashboard-icon text-primary"></i>
+                            <h3 class="count-up" data-count="{{ total_modules }}">{{ total_modules }}</h3>
+                            <p class="text-muted">Registered Modules</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card dashboard-card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-trophy dashboard-icon text-success"></i>
+                            <h3 class="count-up" data-count="{{ total_credits }}">{{ total_credits }}</h3>
+                            <p class="text-muted">Credits Earned</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Modules -->
+            <div class="card dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-book me-2"></i>My Modules
+                    </h5>
+                    <a href="{% url 'students:my_modules' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if registered_modules %}
+                        {% for registration in registered_modules %}
+                        <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                            <div>
+                                <h6 class="mb-1">{{ registration.module.name }}</h6>
+                                <small class="text-muted">{{ registration.module.code }} • {{ registration.module.credit }} Credits</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="module-category">{{ registration.module.get_category_display }}</span><br>
+                                <small class="text-muted">Registered: {{ registration.date_registered|date:"M d" }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+                            <h6>No modules registered yet</h6>
+                            <p class="text-muted">Start by browsing available modules</p>
+                            <a href="{% url 'modules:list' %}" class="btn btn-primary">
+                                <i class="fas fa-search me-2"></i>Browse Modules
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="card dashboard-card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center mb-3">
+                            <a href="{% url 'modules:list' %}" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-search fa-2x mb-2"></i><br>
+                                Browse Modules
+                            </a>
+                        </div>
+                        <div class="col-md-3 text-center mb-3">
+                            <a href="{% url 'students:my_modules' %}" class="btn btn-outline-success btn-lg">
+                                <i class="fas fa-book fa-2x mb-2"></i><br>
+                                My Modules
+                            </a>
+                        </div>
+                        <div class="col-md-3 text-center mb-3">
+                            <a href="{% url 'students:profile_edit' %}" class="btn btn-outline-info btn-lg">
+                                <i class="fas fa-user-edit fa-2x mb-2"></i><br>
+                                Update Profile
+                            </a>
+                        </div>
+                        <div class="col-md-3 text-center mb-3">
+                            <a href="{% url 'core:contact' %}" class="btn btn-outline-warning btn-lg">
+                                <i class="fas fa-question-circle fa-2x mb-2"></i><br>
+                                Get Help
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="card">
+                <div class="card-body py-5">
+                    <i class="fas fa-user-plus fa-4x text-muted mb-3"></i>
+                    <h3>Complete Your Profile</h3>
+                    <p class="text-muted">Please complete your student profile to access the dashboard.</p>
+                    <a href="{% url 'students:profile_edit' %}" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>Complete Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

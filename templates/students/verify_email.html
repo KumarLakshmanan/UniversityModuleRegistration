@@ -1,0 +1,102 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Email Verification - University Module Registration System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg rounded-4 border-0">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <div class="bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="fas fa-envelope-check fa-2x text-white"></i>
+                        </div>
+                        <h3 class="fw-bold mb-0">Email Verification</h3>
+                        <p class="text-muted">Please enter the verification code sent to your email</p>
+                    </div>
+
+                    <form method="post" autocomplete="off">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control form-control-lg" id="email" name="email" 
+                                   value="{{ email }}" required {% if email %}readonly{% endif %}>
+                        </div>
+                        <div class="mb-3">
+                            <label for="otp" class="form-label">Verification Code</label>
+                            <input type="text" class="form-control form-control-lg text-center" id="otp" name="otp" 
+                                   placeholder="Enter 6-digit code" maxlength="6" required>
+                            <div class="form-text">Check your email for the 6-digit verification code</div>
+                        </div>
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                                <i class="fas fa-check me-2"></i>Verify Email
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center">
+                        <p class="mb-2">Didn't receive the code?</p>
+                        <a href="#" class="text-decoration-none" id="resend-link">
+                            <i class="fas fa-redo me-1"></i>Resend Code
+                        </a>
+                        <div id="resend-message" class="mt-2"></div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <p>Remember your password? <a href="{% url 'students:login' %}">Login here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function resendCode() {
+    const email = document.getElementById('email').value;
+    if (!email) {
+        alert('Please enter your email address first.');
+        return;
+    }
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const messageDiv = document.getElementById('resend-message');
+    messageDiv.innerHTML = '<span class="text-info">Sending...</span>';
+    fetch(window.location.pathname, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            'action': 'resend',
+            'email': email
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            messageDiv.innerHTML = '<span class="text-success">' + data.message + '</span>';
+        } else {
+            messageDiv.innerHTML = '<span class="text-danger">' + data.message + '</span>';
+        }
+    })
+    .catch(error => {
+        messageDiv.innerHTML = '<span class="text-danger">An error occurred. Please try again.</span>';
+    });
+}
+document.getElementById('resend-link').addEventListener('click', function(e) {
+    e.preventDefault();
+    resendCode();
+});
+// Auto-focus on OTP input and auto-submit when 6 digits entered
+document.getElementById('otp').addEventListener('input', function(e) {
+    if (e.target.value.length === 6) {
+        // Optional: auto-submit form when 6 digits are entered
+        // e.target.closest('form').submit();
+    }
+});
+</script>
+{% endblock %}

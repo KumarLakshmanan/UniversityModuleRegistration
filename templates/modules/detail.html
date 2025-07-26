@@ -1,0 +1,145 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ module.name }} - University Module Registration System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Module Information -->
+        <div class="col-lg-8">
+            <div class="card module-card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="module-code me-2">{{ module.code }}</span>
+                            <span class="module-category">{{ module.get_category_display }}</span>
+                        </div>
+                        <div>
+                            {% if module.availability %}
+                                {% if module.is_full %}
+                                    <span class="registration-status status-full">Full</span>
+                                {% else %}
+                                    <span class="registration-status status-available">Available</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="registration-status status-full">Unavailable</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h1 class="card-title">{{ module.name }}</h1>
+                    <p class="card-text">{{ module.description }}</p>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <strong>Credits:</strong><br>
+                            <span class="module-credit">{{ module.credit }}</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Category:</strong><br>
+                            {{ module.get_category_display }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Enrolled:</strong><br>
+                            <span class="student-count" data-module="{{ module.code }}">{{ module.registered_students_count }}</span> / {{ module.max_students }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Available Spots:</strong><br>
+                            {{ module.available_spots }}
+                        </div>
+                    </div>
+                    
+                    <!-- Registration Button -->
+                    {% if user.is_authenticated %}
+                        {% if is_registered %}
+                            <button class="btn btn-danger btn-unregister" 
+                                    data-module="{{ module.code }}" 
+                                    data-url="{% url 'modules:unregister' code=module.code %}"
+                                    data-register-url="{% url 'modules:register' code=module.code %}"
+                                    data-unregister-url="{% url 'modules:unregister' code=module.code %}">
+                                <i class="fas fa-user-minus me-2"></i>Unregister
+                            </button>
+                        {% else %}
+                            {% if module.availability and not module.is_full %}
+                                <button class="btn btn-primary btn-register" 
+                                        data-module="{{ module.code }}" 
+                                        data-url="{% url 'modules:register' code=module.code %}"
+                                        data-register-url="{% url 'modules:register' code=module.code %}"
+                                        data-unregister-url="{% url 'modules:unregister' code=module.code %}">
+                                    <i class="fas fa-user-plus me-2"></i>Register
+                                </button>
+                            {% else %}
+                                <button class="btn btn-secondary" disabled>
+                                    <i class="fas fa-times me-2"></i>
+                                    {% if not module.availability %}Not Available{% else %}Full{% endif %}
+                                </button>
+                            {% endif %}
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'students:login' %}" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login to Register
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Registered Students -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-users me-2"></i>Registered Students
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if registered_students %}
+                        <div class="list-group list-group-flush">
+                            {% for registration in registered_students %}
+                            <div class="list-group-item px-0">
+                                <div class="d-flex align-items-center">
+                                    {% if registration.student.photo %}
+                                        <img src="{{ registration.student.photo.url }}" 
+                                             alt="{{ registration.student.full_name }}" 
+                                             class="rounded-circle me-3" 
+                                             width="40" height="40">
+                                    {% else %}
+                                        <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-3" 
+                                             style="width: 40px; height: 40px;">
+                                            <i class="fas fa-user text-white"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div class="flex-grow-1">
+                                        <strong>{{ registration.student.full_name }}</strong><br>
+                                        <small class="text-muted">
+                                            Registered: {{ registration.date_registered|date:"M d, Y" }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-user-slash fa-2x text-muted mb-2"></i>
+                            <p class="text-muted">No students registered yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navigation -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="{% url 'modules:list' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Modules
+            </a>
+        </div>
+    </div>
+</div>
+
+{% csrf_token %}
+{% endblock %}
