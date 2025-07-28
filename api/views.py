@@ -108,24 +108,3 @@ class RegistrationViewSet(viewsets.ReadOnlyModelViewSet):
     ordering_fields = ['date_registered', 'module__name']
     ordering = ['-date_registered']
 
-
-class ExternalDataView(APIView):
-    """View to fetch external API data"""
-    permission_classes = [permissions.IsAuthenticated]
-    
-    def get(self, request):
-        try:
-            # Example: Fetch data from a public API (JSONPlaceholder)
-            response = requests.get('https://jsonplaceholder.typicode.com/posts?_limit=5')
-            external_data = response.json()
-            
-            return Response({
-                'success': True,
-                'external_data': external_data,
-                'message': 'External data fetched successfully'
-            })
-        except Exception as e:
-            return Response({
-                'success': False,
-                'message': f'Error fetching external data: {str(e)}'
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

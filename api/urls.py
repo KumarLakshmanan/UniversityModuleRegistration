@@ -13,5 +13,4 @@ router.register(r'registrations', views.RegistrationViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('auth/token/', obtain_auth_token, name='token'),
-    path('external-data/', views.ExternalDataView.as_view(), name='external_data'),
 ]
