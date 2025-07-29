@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from modules.models import Module
 from students.models import Student
 from registrations.models import Registration
-from sitecore.models import SiteConfiguration, NewsUpdate
+from portalcontent.models import SiteConfiguration, NewsUpdate
 from accounts.models import ContactMessage
 import random
 

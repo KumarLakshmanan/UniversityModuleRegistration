@@ -17,7 +17,7 @@
 | `students`    | Student profile management, dashboard                  |
 | `modules`     | Module listing, search, detail, registration logic     |
 | `registrations`| Track/manage student-module enrolment                  |
-| `sitecore`    | Home, About, Contact, static informational pages        |
+| `portalcontent`    | Home, About, Contact, static informational pages        |
 | `api`         | DRF-based viewsets for all core models (API interface) |
 
 ## 3. Database Setup, Migrations, and Seed Data
@@ -93,7 +93,7 @@ DATABASES = {
     - Only by that student.
 - **API Response:** Returns correct JSON status (success/fail).
 
-### **E. `sitecore/tests.py`**
+### **E. `portalcontent/tests.py`**
 
 - **Home, About, Contact** page loads.
 - **Contact form API** (`/api/contact/`)

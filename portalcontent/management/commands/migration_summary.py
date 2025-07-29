@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
 class Command(BaseCommand):
-    help = 'Summarizes the migration from sitecore to portalcontent'
+    help = 'Summarizes the migration from portalcontent to portalcontent'
 
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS(
@@ -24,7 +24,7 @@ class Command(BaseCommand):
             '- Fix test failures in portalcontent app\n'
             '- Fix test failures in other apps that depend on portalcontent\n'
             '- Run full test suite to ensure everything works\n'
-            '- Remove sitecore app with python manage.py remove_sitecore --confirm\n'
+            '- Remove portalcontent app with python manage.py remove_sitecore --confirm\n'
         ))
         
         self.stdout.write(self.style.SUCCESS(

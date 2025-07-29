@@ -6,7 +6,7 @@ from rest_framework import status
 from modules.models import Module, Department
 from students.models import Student
 from registrations.models import Registration
-from sitecore.models import NewsItem, ContactMessage
+from portalcontent.models import NewsItem, ContactMessage
 
 
 class APIAuthenticationTestCase(APITestCase):

@@ -114,7 +114,7 @@ def logout_view(request):
     """User logout view"""
     logout(request)
     messages.success(request, 'You have been logged out successfully.')
-    return redirect('sitecore:home')
+    return redirect('portalcontent:home')
 
 
 def verify_otp_view(request, user_id):
