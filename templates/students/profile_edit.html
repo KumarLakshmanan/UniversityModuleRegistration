@@ -1,0 +1,321 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-form-container {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        min-height: 100vh;
+    }
+    .form-card {
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+    }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    .form-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+    .form-input:focus {
+        outline: none;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    .form-textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+    .profile-photo-preview {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .photo-upload-area {
+        border: 2px dashed #d1d5db;
+        border-radius: 0.5rem;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    .photo-upload-area:hover {
+        border-color: #6366f1;
+        background-color: #f8fafc;
+    }
+    .error-message {
+        color: #dc2626;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    .success-message {
+        color: #059669;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-form-container">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-white mb-2">Edit Profile</h1>
+                <p class="text-white opacity-90">Update your personal information and preferences</p>
+            </div>
+
+            <!-- Form Card -->
+            <div class="form-card rounded-2xl shadow-2xl p-8">
+                <form method="post" enctype="multipart/form-data" id="profileForm">
+                    {% csrf_token %}
+                    
+                    <!-- Profile Photo Section -->
+                    <div class="text-center mb-8">
+                        <div class="mb-4">
+                            {% if student.profile_picture %}
+                                <img src="{{ student.profile_picture.url }}" 
+                                     alt="Profile Photo" 
+                                     class="profile-photo-preview mx-auto"
+                                     id="photoPreview">
+                            {% else %}
+                                <div class="profile-photo-preview mx-auto bg-gray-200 flex items-center justify-center">
+                                    <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="photo-upload-area" onclick="document.getElementById('photoInput').click()">
+                            <svg class="w-8 h-8 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            <p class="text-gray-600">Click to upload new photo</p>
+                            <p class="text-sm text-gray-500">PNG, JPG up to 5MB</p>
+                        </div>
+                        <input type="file" 
+                               id="photoInput" 
+                               name="profile_picture" 
+                               accept="image/*" 
+                               class="hidden"
+                               onchange="previewPhoto(this)">
+                    </div>
+
+                    <!-- Personal Information -->
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div class="form-group">
+                            <label for="first_name" class="form-label">First Name *</label>
+                            <input type="text" 
+                                   id="first_name" 
+                                   name="first_name" 
+                                   value="{{ user.first_name }}" 
+                                   class="form-input" 
+                                   required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="last_name" class="form-label">Last Name *</label>
+                            <input type="text" 
+                                   id="last_name" 
+                                   name="last_name" 
+                                   value="{{ user.last_name }}" 
+                                   class="form-input" 
+                                   required>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" 
+                                   id="email" 
+                                   name="email" 
+                                   value="{{ user.email }}" 
+                                   class="form-input" 
+                                   required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="student_id" class="form-label">Student ID</label>
+                            <input type="text" 
+                                   id="student_id" 
+                                   name="student_id" 
+                                   value="{{ student.student_id }}" 
+                                   class="form-input" 
+                                   readonly>
+                        </div>
+                    </div>
+
+                    <!-- Additional Information -->
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div class="form-group">
+                            <label for="phone_number" class="form-label">Phone Number</label>
+                            <input type="tel" 
+                                   id="phone_number" 
+                                   name="phone_number" 
+                                   value="{{ student.phone_number|default:'' }}" 
+                                   class="form-input"
+                                   placeholder="+44 20 7946 0958">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="date_of_birth" class="form-label">Date of Birth</label>
+                            <input type="date" 
+                                   id="date_of_birth" 
+                                   name="date_of_birth" 
+                                   value="{{ student.date_of_birth|date:'Y-m-d' }}" 
+                                   class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-6">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea id="address" 
+                                  name="address" 
+                                  class="form-input form-textarea"
+                                  placeholder="Enter your full address">{{ student.address|default:'' }}</textarea>
+                    </div>
+
+                    <!-- Academic Information -->
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div class="form-group">
+                            <label for="year_of_study" class="form-label">Year of Study</label>
+                            <select id="year_of_study" name="year_of_study" class="form-input">
+                                <option value="">Select year</option>
+                                <option value="1" {% if student.year_of_study == '1' %}selected{% endif %}>Year 1</option>
+                                <option value="2" {% if student.year_of_study == '2' %}selected{% endif %}>Year 2</option>
+                                <option value="3" {% if student.year_of_study == '3' %}selected{% endif %}>Year 3</option>
+                                <option value="4" {% if student.year_of_study == '4' %}selected{% endif %}>Year 4</option>
+                                <option value="postgrad" {% if student.year_of_study == 'postgrad' %}selected{% endif %}>Postgraduate</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="course" class="form-label">Course/Program</label>
+                            <input type="text" 
+                                   id="course" 
+                                   name="course" 
+                                   value="{{ student.course|default:'' }}" 
+                                   class="form-input"
+                                   placeholder="e.g., Computer Science">
+                        </div>
+                    </div>
+
+                    <!-- Bio -->
+                    <div class="form-group mb-8">
+                        <label for="bio" class="form-label">Bio</label>
+                        <textarea id="bio" 
+                                  name="bio" 
+                                  class="form-input form-textarea"
+                                  placeholder="Tell us a bit about yourself...">{{ student.bio|default:'' }}</textarea>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button type="submit" 
+                                class="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                            Update Profile
+                        </button>
+                        <a href="{% url 'students:dashboard' %}" 
+                           class="flex-1 bg-gray-300 text-gray-700 text-center py-3 px-6 rounded-lg font-semibold hover:bg-gray-400 transition-colors">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('profileForm');
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        
+        fetch(window.location.href, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            },
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.href = '{% url "students:dashboard" %}';
+            } else {
+                return response.text().then(text => {
+                    throw new Error('Update failed');
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error updating profile. Please try again.');
+        });
+    });
+});
+
+function previewPhoto(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const preview = document.getElementById('photoPreview');
+            if (preview) {
+                preview.src = e.target.result;
+            } else {
+                // Create new preview if doesn't exist
+                const container = input.parentElement.previousElementSibling;
+                container.innerHTML = `<img src="${e.target.result}" alt="Profile Photo" class="profile-photo-preview mx-auto" id="photoPreview">`;
+            }
+        };
+        
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Validate file size and type
+document.getElementById('photoInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        // Check file size (5MB limit)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File size must be less than 5MB');
+            e.target.value = '';
+            return;
+        }
+        
+        // Check file type
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file');
+            e.target.value = '';
+            return;
+        }
+    }
+});
+</script>
+{% endblock %}

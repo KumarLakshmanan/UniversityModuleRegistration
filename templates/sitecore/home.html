@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - University Module Registration System{% endblock %}
+
+{% block content %}
+<div class="hero bg-gradient-to-r from-blue-600 to-purple-700 text-white rounded-lg p-12 mb-8">
+    <div class="text-center">
+        <h1 class="text-4xl font-bold mb-4">Welcome to University Module Registration</h1>
+        <p class="text-xl mb-8">Your gateway to academic excellence. Register for modules, track your progress, and achieve your goals.</p>
+        {% if not user.is_authenticated %}
+            <div class="space-x-4">
+                <a href="{% url 'accounts:register' %}" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">Get Started</a>
+                <a href="{% url 'modules:module_list' %}" class="border border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition">Browse Modules</a>
+            </div>
+        {% else %}
+            <div class="space-x-4">
+                <a href="{% url 'students:dashboard' %}" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">My Dashboard</a>
+                <a href="{% url 'modules:module_list' %}" class="border border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition">Browse Modules</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="grid md:grid-cols-3 gap-8 mb-12">
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="text-blue-600 text-3xl mb-4">📚</div>
+        <h3 class="text-xl font-semibold mb-2">Module Management</h3>
+        <p class="text-gray-600">Browse and register for modules across different semesters and categories.</p>
+    </div>
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="text-blue-600 text-3xl mb-4">📊</div>
+        <h3 class="text-xl font-semibold mb-2">Track Progress</h3>
+        <p class="text-gray-600">Monitor your registration status, grades, and academic progress.</p>
+    </div>
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="text-blue-600 text-3xl mb-4">🎯</div>
+        <h3 class="text-xl font-semibold mb-2">Easy Registration</h3>
+        <p class="text-gray-600">Simple and intuitive module registration process with real-time updates.</p>
+    </div>
+</div>
+
+<!-- Statistics Section -->
+<div class="bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold text-center mb-8">Our Platform Statistics</h2>
+    <div class="grid md:grid-cols-4 gap-6 text-center">
+        <div>
+            <div class="text-3xl font-bold text-blue-600" id="stat-students">0</div>
+            <div class="text-gray-600">Active Students</div>
+        </div>
+        <div>
+            <div class="text-3xl font-bold text-green-600" id="stat-modules">0</div>
+            <div class="text-gray-600">Available Modules</div>
+        </div>
+        <div>
+            <div class="text-3xl font-bold text-purple-600" id="stat-registrations">0</div>
+            <div class="text-gray-600">Total Registrations</div>
+        </div>
+        <div>
+            <div class="text-3xl font-bold text-orange-600" id="stat-satisfaction">98%</div>
+            <div class="text-gray-600">Student Satisfaction</div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Animate counters
+function animateCounter(element, target) {
+    let current = 0;
+    const increment = target / 100;
+    const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+            element.textContent = target;
+            clearInterval(timer);
+        } else {
+            element.textContent = Math.floor(current);
+        }
+    }, 20);
+}
+
+// Load stats from API (placeholder for now)
+document.addEventListener('DOMContentLoaded', function() {
+    // Placeholder values - in real implementation, fetch from API
+    animateCounter(document.getElementById('stat-students'), 1250);
+    animateCounter(document.getElementById('stat-modules'), 85);
+    animateCounter(document.getElementById('stat-registrations'), 3420);
+});
+</script>
+{% endblock %}

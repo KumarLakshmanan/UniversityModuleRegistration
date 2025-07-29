@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Access Denied{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-container {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .error-card {
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 1rem;
+        padding: 2rem;
+        text-align: center;
+        max-width: 500px;
+        margin: 0 auto;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+    }
+    .error-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        color: #ef4444;
+    }
+    .pulse-animation {
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="container mx-auto px-4">
+        <div class="error-card">
+            <!-- Error Icon -->
+            <div class="error-icon pulse-animation">
+                <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.366zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+
+            <!-- Error Message -->
+            <h1 class="text-3xl font-bold text-gray-900 mb-4">Access Denied</h1>
+            <p class="text-gray-600 mb-6">
+                Sorry, you don't have permission to access this page. 
+                {% if not user.is_authenticated %}
+                Please log in to continue.
+                {% else %}
+                Please contact an administrator if you believe this is an error.
+                {% endif %}
+            </p>
+
+            <!-- Error Details -->
+            {% if error_message %}
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                <p class="text-red-700 text-sm">{{ error_message }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Action Buttons -->
+            <div class="space-y-3">
+                {% if not user.is_authenticated %}
+                <a href="{% url 'accounts:login' %}" 
+                   class="w-full inline-block bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-indigo-700 transition-colors">
+                    Log In
+                </a>
+                <a href="{% url 'accounts:register' %}" 
+                   class="w-full inline-block bg-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-400 transition-colors">
+                    Create Account
+                </a>
+                {% else %}
+                <a href="{% url 'students:dashboard' %}" 
+                   class="w-full inline-block bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-indigo-700 transition-colors">
+                    Go to Dashboard
+                </a>
+                {% endif %}
+                
+                <a href="{% url 'portalcontent:home' %}" 
+                   class="w-full inline-block bg-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-400 transition-colors">
+                    Go Home
+                </a>
+            </div>
+
+            <!-- Help Text -->
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <p class="text-sm text-gray-500">
+                    Need help? 
+                    <a href="{% url 'portalcontent:contact' %}" class="text-indigo-600 hover:text-indigo-500">
+                        Contact us
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Auto-redirect after 10 seconds if not authenticated
+{% if not user.is_authenticated %}
+setTimeout(function() {
+    if (confirm('Would you like to be redirected to the login page?')) {
+        window.location.href = '{% url "accounts:login" %}';
+    }
+}, 10000);
+{% endif %}
+</script>
+{% endblock %}
