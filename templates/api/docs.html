@@ -1,0 +1,390 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}API Documentation - Course Registration{% endblock %}
+
+{% block extra_css %}
+<style>
+    .api-container {
+        margin-top: 30px;
+    }
+    .endpoint-card {
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border-left: 4px solid #26a69a;
+    }
+    .method-badge {
+        border-radius: 4px;
+        padding: 4px 8px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        margin-right: 10px;
+    }
+    .method-get { background-color: #4caf50; color: white; }
+    .method-post { background-color: #2196f3; color: white; }
+    .method-put { background-color: #ff9800; color: white; }
+    .method-delete { background-color: #f44336; color: white; }
+    
+    .code-block {
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 15px;
+        margin: 10px 0;
+        overflow-x: auto;
+    }
+    .code-block pre {
+        margin: 0;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+    }
+    .section-nav {
+        position: sticky;
+        top: 80px;
+        z-index: 100;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container api-container">
+    <div class="row">
+        <!-- Navigation Sidebar -->
+        <div class="col s12 m3">
+            <div class="section-nav">
+                <div class="card">
+                    <div class="card-content">
+                        <h6 class="teal-text">API Sections</h6>
+                        <ul class="collection">
+                            <a href="#overview" class="collection-item waves-effect">
+                                <i class="material-icons left tiny">info</i>Overview
+                            </a>
+                            <a href="#authentication" class="collection-item waves-effect">
+                                <i class="material-icons left tiny">security</i>Authentication
+                            </a>
+                            <a href="#students" class="collection-item waves-effect">
+                                <i class="material-icons left tiny">person</i>Students
+                            </a>
+                            <a href="#modules" class="collection-item waves-effect">
+                                <i class="material-icons left tiny">book</i>Modules
+                            </a>
+                            <a href="#registrations" class="collection-item waves-effect">
+                                <i class="material-icons left tiny">assignment</i>Registrations
+                            </a>
+                            <a href="#errors" class="collection-item waves-effect">
+                                <i class="material-icons left tiny">error</i>Error Codes
+                            </a>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col s12 m9">
+            <!-- Overview Section -->
+            <section id="overview">
+                <h4 class="teal-text">
+                    <i class="material-icons left">api</i>
+                    API Documentation
+                </h4>
+                <p class="grey-text">
+                    Welcome to the Course Registration System API. This RESTful API provides programmatic access 
+                    to manage students, modules, and registrations.
+                </p>
+                
+                <div class="card">
+                    <div class="card-content">
+                        <h6>Base URL</h6>
+                        <div class="code-block">
+                            <pre>{{ request.build_absolute_uri }}api/</pre>
+                        </div>
+                        <h6>Content Type</h6>
+                        <p>All requests and responses use JSON format.</p>
+                        <div class="code-block">
+                            <pre>Content-Type: application/json</pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Authentication Section -->
+            <section id="authentication">
+                <h5 class="teal-text">Authentication</h5>
+                <p>Currently, the API uses session-based authentication. Future versions will support token authentication.</p>
+                
+                <div class="card endpoint-card">
+                    <div class="card-content">
+                        <h6>Authentication Requirements</h6>
+                        <p>Most endpoints require user authentication. Ensure you're logged in before making API calls.</p>
+                        <div class="code-block">
+                            <pre>// Include session cookies in your requests
+fetch('/api/students/', {
+    credentials: 'same-origin',
+    headers: {
+        'X-CSRFToken': getCsrfToken()
+    }
+});</pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Students Section -->
+            <section id="students">
+                <h5 class="teal-text">Students</h5>
+                
+                <div class="card endpoint-card">
+                    <div class="card-content">
+                        <span class="method-badge method-get">GET</span>
+                        <strong>/api/students/</strong>
+                        <p>Retrieve a list of all students (admin only).</p>
+                        
+                        <h6>Response Example:</h6>
+                        <div class="code-block">
+                            <pre>[
+    {
+        "id": 1,
+        "user": {
+            "username": "john_doe",
+            "email": "john@example.com",
+            "first_name": "John",
+            "last_name": "Doe"
+        },
+        "student_id": "STU001",
+        "date_of_birth": "1995-06-15",
+        "phone_number": "+1234567890",
+        "is_verified": true,
+        "date_created": "2024-01-15T10:30:00Z"
+    }
+]</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card endpoint-card">
+                    <div class="card-content">
+                        <span class="method-badge method-get">GET</span>
+                        <strong>/api/students/{id}/</strong>
+                        <p>Retrieve details of a specific student.</p>
+                        
+                        <h6>Parameters:</h6>
+                        <ul>
+                            <li><strong>id</strong> (integer): Student ID</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Modules Section -->
+            <section id="modules">
+                <h5 class="teal-text">Modules</h5>
+                
+                <div class="card endpoint-card">
+                    <div class="card-content">
+                        <span class="method-badge method-get">GET</span>
+                        <strong>/api/modules/</strong>
+                        <p>Retrieve a list of all available modules.</p>
+                        
+                        <h6>Query Parameters:</h6>
+                        <ul>
+                            <li><strong>search</strong> (string): Search by title or code</li>
+                            <li><strong>category</strong> (string): Filter by category</li>
+                            <li><strong>is_active</strong> (boolean): Filter by active status</li>
+                        </ul>
+                        
+                        <h6>Response Example:</h6>
+                        <div class="code-block">
+                            <pre>[
+    {
+        "id": 1,
+        "code": "CS101",
+        "title": "Introduction to Computer Science",
+        "description": "Basic concepts of computer science...",
+        "credits": 3,
+        "category": "Computer Science",
+        "instructor": "Dr. Smith",
+        "start_date": "2024-02-01",
+        "end_date": "2024-05-15",
+        "max_students": 30,
+        "enrolled_count": 25,
+        "is_active": true
+    }
+]</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card endpoint-card">
+                    <div class="card-content">
+                        <span class="method-badge method-get">GET</span>
+                        <strong>/api/modules/{id}/</strong>
+                        <p>Retrieve details of a specific module.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Registrations Section -->
+            <section id="registrations">
+                <h5 class="teal-text">Registrations</h5>
+                
+                <div class="card endpoint-card">
+                    <div class="card-content">
+                        <span class="method-badge method-get">GET</span>
+                        <strong>/api/registrations/</strong>
+                        <p>Retrieve registrations for the current user.</p>
+                        
+                        <h6>Response Example:</h6>
+                        <div class="code-block">
+                            <pre>[
+    {
+        "id": 1,
+        "module": {
+            "id": 1,
+            "code": "CS101",
+            "title": "Introduction to Computer Science",
+            "credits": 3
+        },
+        "status": "enrolled",
+        "date_registered": "2024-01-15T10:30:00Z",
+        "is_active": true
+    }
+]</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card endpoint-card">
+                    <div class="card-content">
+                        <span class="method-badge method-post">POST</span>
+                        <strong>/api/registrations/</strong>
+                        <p>Register for a new module.</p>
+                        
+                        <h6>Request Body:</h6>
+                        <div class="code-block">
+                            <pre>{
+    "module_id": 1
+}</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card endpoint-card">
+                    <div class="card-content">
+                        <span class="method-badge method-delete">DELETE</span>
+                        <strong>/api/registrations/{id}/</strong>
+                        <p>Withdraw from a module (sets status to withdrawn).</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Error Codes Section -->
+            <section id="errors">
+                <h5 class="teal-text">Error Codes</h5>
+                
+                <div class="card">
+                    <div class="card-content">
+                        <h6>HTTP Status Codes</h6>
+                        <ul class="collection">
+                            <li class="collection-item">
+                                <strong>200 OK</strong> - Request successful
+                            </li>
+                            <li class="collection-item">
+                                <strong>201 Created</strong> - Resource created successfully
+                            </li>
+                            <li class="collection-item">
+                                <strong>400 Bad Request</strong> - Invalid request data
+                            </li>
+                            <li class="collection-item">
+                                <strong>401 Unauthorized</strong> - Authentication required
+                            </li>
+                            <li class="collection-item">
+                                <strong>403 Forbidden</strong> - Permission denied
+                            </li>
+                            <li class="collection-item">
+                                <strong>404 Not Found</strong> - Resource not found
+                            </li>
+                            <li class="collection-item">
+                                <strong>500 Internal Server Error</strong> - Server error
+                            </li>
+                        </ul>
+                        
+                        <h6>Error Response Format:</h6>
+                        <div class="code-block">
+                            <pre>{
+    "error": "Error message",
+    "details": "Additional error details",
+    "code": "ERROR_CODE"
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Test API Section -->
+            <section id="test-api" style="margin-top: 40px;">
+                <div class="card teal lighten-5">
+                    <div class="card-content">
+                        <h6 class="teal-text">
+                            <i class="material-icons left">code</i>
+                            Test the API
+                        </h6>
+                        <p>You can test the API endpoints using the browser's developer console or tools like Postman.</p>
+                        <div class="center-align" style="margin-top: 20px;">
+                            <a href="/api/" class="btn teal waves-effect waves-light">
+                                <i class="material-icons left">launch</i>
+                                Open API Root
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Highlight current section in navigation
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.collection-item[href^="#"]');
+    
+    function highlightNavigation() {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (window.pageYOffset >= sectionTop - 100) {
+                current = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + current) {
+                link.classList.add('active');
+            }
+        });
+    }
+    
+    window.addEventListener('scroll', highlightNavigation);
+    highlightNavigation(); // Initial call
+});
+</script>
+{% endblock %}

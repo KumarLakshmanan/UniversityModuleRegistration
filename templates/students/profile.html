@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - Course Module Registration System{% endblock %}
+
+{% block content %}
+<div class="container section">
+    <div class="row">
+        <div class="col s12">
+            <h2 class="blue-text">Student Profile</h2>
+            <p class="flow-text">View and manage your personal information</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Profile Photo and Basic Info -->
+        <div class="col s12 m4">
+            <div class="card">
+                <div class="card-content center profile-info">
+                    {% if student.photo %}
+                        <img src="{{ student.photo.url }}" alt="Profile Photo" class="profile-photo responsive-img">
+                    {% else %}
+                        <div class="profile-photo grey lighten-3 center-align" style="display: flex; align-items: center; justify-content: center;">
+                            <i class="material-icons large grey-text">person</i>
+                        </div>
+                    {% endif %}
+                    
+                    <h4>{{ student.get_full_name }}</h4>
+                    <p class="grey-text">{{ student.user.username }}</p>
+                    
+                    {% if student.is_verified %}
+                        <span class="chip green white-text">
+                            <i class="material-icons left">verified</i>
+                            Verified
+                        </span>
+                    {% else %}
+                        <span class="chip red white-text">
+                            <i class="material-icons left">warning</i>
+                            Unverified
+                        </span>
+                    {% endif %}
+                    
+                    <div class="section">
+                        <a href="{% url 'students:profile_edit' %}" class="btn blue waves-effect waves-light">
+                            <i class="material-icons left">edit</i>
+                            Edit Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Profile Details -->
+        <div class="col s12 m8">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">
+                        <i class="material-icons left">info</i>
+                        Personal Information
+                    </span>
+                    
+                    <div class="row">
+                        <div class="col s12 m6">
+                            <h6><strong>First Name</strong></h6>
+                            <p>{{ student.user.first_name|default:"Not provided" }}</p>
+                        </div>
+                        <div class="col s12 m6">
+                            <h6><strong>Last Name</strong></h6>
+                            <p>{{ student.user.last_name|default:"Not provided" }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col s12 m6">
+                            <h6><strong>Email</strong></h6>
+                            <p>{{ student.user.email|default:"Not provided" }}</p>
+                        </div>
+                        <div class="col s12 m6">
+                            <h6><strong>Phone</strong></h6>
+                            <p>{{ student.phone|default:"Not provided" }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col s12 m6">
+                            <h6><strong>Date of Birth</strong></h6>
+                            <p>{{ student.date_of_birth|default:"Not provided"|date:"F d, Y" }}</p>
+                        </div>
+                        <div class="col s12 m6">
+                            <h6><strong>Member Since</strong></h6>
+                            <p>{{ student.user.date_joined|date:"F d, Y" }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <h6 class="section"><strong>Address Information</strong></h6>
+                    
+                    <div class="row">
+                        <div class="col s12">
+                            <h6><strong>Address</strong></h6>
+                            <p>{{ student.address|default:"Not provided" }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col s12 m6">
+                            <h6><strong>City</strong></h6>
+                            <p>{{ student.city|default:"Not provided" }}</p>
+                        </div>
+                        <div class="col s12 m6">
+                            <h6><strong>Country</strong></h6>
+                            <p>{{ student.country|default:"Not provided" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Account Statistics -->
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">
+                        <i class="material-icons left">assessment</i>
+                        Account Statistics
+                    </span>
+                    
+                    <div class="row">
+                        <div class="col s6 m3">
+                            <div class="center">
+                                <h4 class="blue-text">{{ student.registrations.count }}</h4>
+                                <p>Total Registrations</p>
+                            </div>
+                        </div>
+                        <div class="col s6 m3">
+                            <div class="center">
+                                <h4 class="green-text">{{ student.registrations.filter.is_active.count }}</h4>
+                                <p>Active Modules</p>
+                            </div>
+                        </div>
+                        <div class="col s6 m3">
+                            <div class="center">
+                                <h4 class="orange-text">{{ completed_count }}</h4>
+                                <p>Completed</p>
+                            </div>
+                        </div>
+                        <div class="col s6 m3">
+                            <div class="center">
+                                <h4 class="purple-text">{% if student.is_profile_complete %}100{% else %}60{% endif %}%</h4>
+                                <p>Profile Complete</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col s12">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">
+                        <i class="material-icons left">flash_on</i>
+                        Quick Actions
+                    </span>
+                    
+                    <div class="row">
+                        <div class="col s12 m6 l3">
+                            <a href="{% url 'students:profile_edit' %}" class="btn-large blue waves-effect waves-light full-width">
+                                <i class="material-icons left">edit</i>
+                                Edit Profile
+                            </a>
+                        </div>
+                        <div class="col s12 m6 l3">
+                            <a href="{% url 'students:dashboard' %}" class="btn-large green waves-effect waves-light full-width">
+                                <i class="material-icons left">dashboard</i>
+                                Dashboard
+                            </a>
+                        </div>
+                        <div class="col s12 m6 l3">
+                            <a href="{% url 'registrations:my_modules' %}" class="btn-large orange waves-effect waves-light full-width">
+                                <i class="material-icons left">list</i>
+                                My Modules
+                            </a>
+                        </div>
+                        <div class="col s12 m6 l3">
+                            <a href="{% url 'modules:list' %}" class="btn-large purple waves-effect waves-light full-width">
+                                <i class="material-icons left">search</i>
+                                Browse Modules
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

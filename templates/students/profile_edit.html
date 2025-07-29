@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - Course Module Registration System{% endblock %}
+
+{% block content %}
+<div class="container section">
+    <div class="row">
+        <div class="col s12">
+            <h2 class="blue-text">Edit Profile</h2>
+            <p class="flow-text">Update your personal information</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col s12 m8 offset-m2">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">
+                        <i class="material-icons left">edit</i>
+                        Update Profile Information
+                    </span>
+                    
+                    <form method="post" enctype="multipart/form-data" id="profile-form">
+                        {% csrf_token %}
+                        
+                        <!-- Basic Information -->
+                        <h6 class="section blue-text">Basic Information</h6>
+                        
+                        <div class="row">
+                            <div class="input-field col s12 m6">
+                                <input id="first_name" name="first_name" type="text" class="validate" value="{{ student.user.first_name }}" required>
+                                <label for="first_name" class="active">First Name *</label>
+                            </div>
+                            <div class="input-field col s12 m6">
+                                <input id="last_name" name="last_name" type="text" class="validate" value="{{ student.user.last_name }}" required>
+                                <label for="last_name" class="active">Last Name *</label>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <input id="email" name="email" type="email" class="validate" value="{{ student.user.email }}" required>
+                                <label for="email" class="active">Email Address *</label>
+                                <span class="helper-text">Used for important notifications</span>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="input-field col s12 m6">
+                                <input id="phone" name="phone" type="tel" class="validate" value="{{ student.phone }}">
+                                <label for="phone" class="{% if student.phone %}active{% endif %}">Phone Number</label>
+                                <span class="helper-text">Include country code (e.g., +1-555-123-4567)</span>
+                            </div>
+                            <div class="input-field col s12 m6">
+                                <input id="date_of_birth" name="date_of_birth" type="text" class="datepicker" value="{{ student.date_of_birth|date:'Y-m-d' }}">
+                                <label for="date_of_birth" class="{% if student.date_of_birth %}active{% endif %}">Date of Birth</label>
+                            </div>
+                        </div>
+                        
+                        <!-- Profile Photo -->
+                        <h6 class="section blue-text">Profile Photo</h6>
+                        
+                        <div class="row">
+                            <div class="col s12 m6">
+                                {% if student.photo %}
+                                    <div class="center">
+                                        <img src="{{ student.photo.url }}" alt="Current Photo" class="responsive-img" style="max-width: 200px; border-radius: 50%;">
+                                        <p>Current Photo</p>
+                                    </div>
+                                {% else %}
+                                    <div class="center">
+                                        <div class="grey lighten-3" style="width: 200px; height: 200px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                            <i class="material-icons large grey-text">person</i>
+                                        </div>
+                                        <p>No photo uploaded</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col s12 m6">
+                                <div class="file-field input-field">
+                                    <div class="btn blue">
+                                        <span>Choose Photo</span>
+                                        <input type="file" name="photo" accept="image/*">
+                                    </div>
+                                    <div class="file-path-wrapper">
+                                        <input class="file-path validate" type="text" placeholder="Upload a profile photo">
+                                    </div>
+                                    <span class="helper-text">JPG, PNG, or GIF. Max 5MB.</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Address Information -->
+                        <h6 class="section blue-text">Address Information</h6>
+                        
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <textarea id="address" name="address" class="materialize-textarea" data-length="300">{{ student.address }}</textarea>
+                                <label for="address" class="{% if student.address %}active{% endif %}">Street Address</label>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="input-field col s12 m6">
+                                <input id="city" name="city" type="text" class="validate" value="{{ student.city }}">
+                                <label for="city" class="{% if student.city %}active{% endif %}">City</label>
+                            </div>
+                            <div class="input-field col s12 m6">
+                                <input id="country" name="country" type="text" class="validate" value="{{ student.country }}">
+                                <label for="country" class="{% if student.country %}active{% endif %}">Country</label>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Buttons -->
+                        <div class="row section">
+                            <div class="col s12">
+                                <button class="btn waves-effect waves-light blue" type="submit">
+                                    Update Profile
+                                    <i class="material-icons right">save</i>
+                                </button>
+                                <a href="{% url 'students:profile' %}" class="btn-flat waves-effect waves-light grey-text">
+                                    Cancel
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Profile Completion Tip -->
+    <div class="row">
+        <div class="col s12 m8 offset-m2">
+            <div class="card blue lighten-5">
+                <div class="card-content">
+                    <span class="card-title blue-text">
+                        <i class="material-icons left">lightbulb_outline</i>
+                        Profile Tips
+                    </span>
+                    <ul>
+                        <li>• Complete all fields to unlock all platform features</li>
+                        <li>• Use a clear profile photo for better recognition</li>
+                        <li>• Keep your contact information up to date</li>
+                        <li>• Your email is used for important course notifications</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize datepicker
+    var datepickerElems = document.querySelectorAll('.datepicker');
+    M.Datepicker.init(datepickerElems, {
+        format: 'yyyy-mm-dd',
+        yearRange: [1950, new Date().getFullYear() - 16],
+        defaultDate: new Date(),
+        setDefaultDate: false
+    });
+    
+    // Initialize character counter
+    M.CharacterCounter.init(document.querySelectorAll('textarea[data-length]'));
+});
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Course Module Registration System{% endblock %}
+
+{% block content %}
+<div class="container section">
+    <div class="row">
+        <div class="col s12">
+            <h2 class="blue-text">Welcome, {{ student.get_full_name }}!</h2>
+            <p class="flow-text">Manage your academic journey from your personal dashboard.</p>
+        </div>
+    </div>
+    
+    <!-- Quick Stats -->
+    <div class="row">
+        <div class="col s12 m6 l3">
+            <div class="card dashboard-card blue darken-1">
+                <div class="card-content white-text dashboard-stat">
+                    <h4>{{ total_registrations }}</h4>
+                    <p>Registered Modules</p>
+                </div>
+            </div>
+        </div>
+        <div class="col s12 m6 l3">
+            <div class="card dashboard-card green darken-1">
+                <div class="card-content white-text dashboard-stat">
+                    <h4>{{ recent_registrations|length }}</h4>
+                    <p>Recent Activity</p>
+                </div>
+            </div>
+        </div>
+        <div class="col s12 m6 l3">
+            <div class="card dashboard-card orange darken-1">
+                <div class="card-content white-text dashboard-stat">
+                    <h4>{% if profile_complete %}100%{% else %}60%{% endif %}</h4>
+                    <p>Profile Complete</p>
+                </div>
+            </div>
+        </div>
+        <div class="col s12 m6 l3">
+            <div class="card dashboard-card purple darken-1">
+                <div class="card-content white-text dashboard-stat">
+                    <h4>{{ student.user.date_joined|date:"M Y" }}</h4>
+                    <p>Member Since</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Profile Completion Alert -->
+    {% if not profile_complete %}
+    <div class="row">
+        <div class="col s12">
+            <div class="card orange lighten-4">
+                <div class="card-content">
+                    <span class="card-title orange-text text-darken-2">
+                        <i class="material-icons left">warning</i>
+                        Complete Your Profile
+                    </span>
+                    <p>Your profile is incomplete. Complete it to unlock all features and improve your experience.</p>
+                    <div class="card-action">
+                        <a href="{% url 'students:profile_edit' %}" class="btn orange darken-1">Complete Profile</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Main Content Row -->
+    <div class="row">
+        <!-- Recent Registrations -->
+        <div class="col s12 m8">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">
+                        <i class="material-icons left">school</i>
+                        Recent Module Registrations
+                    </span>
+                    
+                    {% if recent_registrations %}
+                        <table class="striped responsive-table">
+                            <thead>
+                                <tr>
+                                    <th>Module</th>
+                                    <th>Code</th>
+                                    <th>Credits</th>
+                                    <th>Registered</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for registration in recent_registrations %}
+                                <tr>
+                                    <td>{{ registration.module.name }}</td>
+                                    <td>{{ registration.module.code }}</td>
+                                    <td>{{ registration.module.credits }}</td>
+                                    <td>{{ registration.date_registered|date:"M d, Y" }}</td>
+                                    <td>
+                                        <span class="badge registration-badge badge-{{ registration.status }}">
+                                            {{ registration.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'modules:detail' registration.module.code %}" class="btn-small blue">
+                                            <i class="material-icons">visibility</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <div class="center">
+                            <i class="material-icons large grey-text">school</i>
+                            <h5 class="grey-text">No registrations yet</h5>
+                            <p>Explore our module catalog and register for your first course!</p>
+                            <a href="{% url 'modules:list' %}" class="btn blue">Browse Modules</a>
+                        </div>
+                    {% endif %}
+                </div>
+                {% if recent_registrations %}
+                <div class="card-action">
+                    <a href="{% url 'registrations:my_modules' %}" class="blue-text">View All Registrations</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="col s12 m4">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">
+                        <i class="material-icons left">flash_on</i>
+                        Quick Actions
+                    </span>
+                    
+                    <div class="collection">
+                        <a href="{% url 'modules:list' %}" class="collection-item blue-text">
+                            <i class="material-icons left">search</i>
+                            Browse Modules
+                        </a>
+                        <a href="{% url 'registrations:my_modules' %}" class="collection-item blue-text">
+                            <i class="material-icons left">list</i>
+                            My Registrations
+                        </a>
+                        <a href="{% url 'students:profile' %}" class="collection-item blue-text">
+                            <i class="material-icons left">person</i>
+                            View Profile
+                        </a>
+                        <a href="{% url 'students:profile_edit' %}" class="collection-item blue-text">
+                            <i class="material-icons left">edit</i>
+                            Edit Profile
+                        </a>
+                        <a href="{% url 'sitecore:contact' %}" class="collection-item blue-text">
+                            <i class="material-icons left">help</i>
+                            Get Help
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Account Status -->
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">
+                        <i class="material-icons left">account_circle</i>
+                        Account Status
+                    </span>
+                    
+                    <div class="collection">
+                        <div class="collection-item">
+                            <span class="left">Email Verified</span>
+                            {% if student.is_verified %}
+                                <span class="right green-text">
+                                    <i class="material-icons">check_circle</i>
+                                </span>
+                            {% else %}
+                                <span class="right red-text">
+                                    <i class="material-icons">cancel</i>
+                                </span>
+                            {% endif %}
+                        </div>
+                        <div class="collection-item">
+                            <span class="left">Profile Complete</span>
+                            {% if profile_complete %}
+                                <span class="right green-text">
+                                    <i class="material-icons">check_circle</i>
+                                </span>
+                            {% else %}
+                                <span class="right orange-text">
+                                    <i class="material-icons">warning</i>
+                                </span>
+                            {% endif %}
+                        </div>
+                        <div class="collection-item">
+                            <span class="left">Active Registrations</span>
+                            <span class="right blue-text">{{ total_registrations }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+// Set current user ID for JavaScript functions
+window.currentUserId = "{{ user.id }}";
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact - Course Module Registration System{% endblock %}
+
+{% block content %}
+<div class="container section">
+    <div class="row">
+        <div class="col s12">
+            <h2 class="center blue-text">Contact Us</h2>
+            <p class="center flow-text">Have questions? We'd love to hear from you.</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Contact Form -->
+        <div class="col s12 m8">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">Send us a Message</span>
+                    <form method="post" id="contact-form">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="input-field col s12 m6">
+                                <input id="name" name="name" type="text" class="validate" required>
+                                <label for="name">Full Name *</label>
+                            </div>
+                            <div class="input-field col s12 m6">
+                                <input id="email" name="email" type="email" class="validate" required>
+                                <label for="email">Email Address *</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12 m6">
+                                <input id="phone" name="phone" type="tel" class="validate">
+                                <label for="phone">Phone Number</label>
+                            </div>
+                            <div class="input-field col s12 m6">
+                                <input id="subject" name="subject" type="text" class="validate" required>
+                                <label for="subject">Subject *</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <textarea id="message" name="message" class="materialize-textarea" data-length="500" required></textarea>
+                                <label for="message">Message *</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <button class="btn waves-effect waves-light blue" type="submit">
+                                    Send Message
+                                    <i class="material-icons right">send</i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contact Information -->
+        <div class="col s12 m4">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">Get in Touch</span>
+                    
+                    <div class="collection">
+                        <div class="collection-item">
+                            <i class="material-icons left blue-text">location_on</i>
+                            <strong>Address</strong><br>
+                            123 University Avenue<br>
+                            Education City, EC 12345
+                        </div>
+                        <div class="collection-item">
+                            <i class="material-icons left blue-text">phone</i>
+                            <strong>Phone</strong><br>
+                            +1 (555) 123-4567
+                        </div>
+                        <div class="collection-item">
+                            <i class="material-icons left blue-text">email</i>
+                            <strong>Email</strong><br>
+                            info@courseregistration.edu
+                        </div>
+                        <div class="collection-item">
+                            <i class="material-icons left blue-text">schedule</i>
+                            <strong>Office Hours</strong><br>
+                            Monday - Friday: 9:00 AM - 5:00 PM<br>
+                            Saturday: 10:00 AM - 2:00 PM<br>
+                            Sunday: Closed
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">Quick Links</span>
+                    <div class="collection">
+                        <a href="{% url 'modules:list' %}" class="collection-item blue-text">
+                            <i class="material-icons left">school</i>Browse Modules
+                        </a>
+                        {% if not user.is_authenticated %}
+                            <a href="{% url 'accounts:register' %}" class="collection-item blue-text">
+                                <i class="material-icons left">person_add</i>Register Account
+                            </a>
+                            <a href="{% url 'accounts:login' %}" class="collection-item blue-text">
+                                <i class="material-icons left">login</i>Student Login
+                            </a>
+                        {% else %}
+                            <a href="{% url 'students:dashboard' %}" class="collection-item blue-text">
+                                <i class="material-icons left">dashboard</i>My Dashboard
+                            </a>
+                            <a href="{% url 'registrations:my_modules' %}" class="collection-item blue-text">
+                                <i class="material-icons left">list</i>My Modules
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'sitecore:about' %}" class="collection-item blue-text">
+                            <i class="material-icons left">info</i>About Us
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- FAQ Section -->
+    <div class="row section">
+        <div class="col s12">
+            <h4 class="center">Frequently Asked Questions</h4>
+            
+            <ul class="collapsible">
+                <li>
+                    <div class="collapsible-header">
+                        <i class="material-icons">help</i>
+                        How do I register for modules?
+                    </div>
+                    <div class="collapsible-body">
+                        <p>First, create an account and verify your email. Then browse the module catalog, 
+                        select your desired modules, and click the "Register" button. Make sure to check 
+                        prerequisites and availability.</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="collapsible-header">
+                        <i class="material-icons">schedule</i>
+                        When is the registration deadline?
+                    </div>
+                    <div class="collapsible-body">
+                        <p>Registration deadlines vary by module and semester. Check the individual module 
+                        details for specific deadlines. Early registration is recommended to secure your spot.</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="collapsible-header">
+                        <i class="material-icons">credit_card</i>
+                        How much do modules cost?
+                    </div>
+                    <div class="collapsible-body">
+                        <p>Module fees depend on the number of credits and category. Detailed fee information 
+                        is available on each module's detail page. Contact the admissions office for 
+                        financial aid options.</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="collapsible-header">
+                        <i class="material-icons">swap_horiz</i>
+                        Can I change my module selection?
+                    </div>
+                    <div class="collapsible-body">
+                        <p>Yes, you can withdraw from modules before the deadline through your dashboard. 
+                        Some modules may have withdrawal fees or academic penalties, so check the 
+                        module policies carefully.</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize collapsible
+    var collapsibleElems = document.querySelectorAll('.collapsible');
+    M.Collapsible.init(collapsibleElems);
+});
+</script>
+{% endblock %}
+{% endblock %}

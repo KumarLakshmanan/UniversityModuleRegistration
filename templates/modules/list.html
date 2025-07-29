@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Modules - Course Module Registration System{% endblock %}
+
+{% block content %}
+<div class="container section">
+    <div class="row">
+        <div class="col s12">
+            <h2 class="center blue-text">Module Catalog</h2>
+            <p class="center flow-text">Explore our comprehensive range of academic modules</p>
+        </div>
+    </div>
+    
+    <!-- Search and Filter Section -->
+    <div class="row search-container">
+        <div class="col s12">
+            <div class="card">
+                <div class="card-content">
+                    <form method="get">
+                        <div class="row">
+                            <div class="input-field col s12 m6">
+                                <input id="search" name="search" type="text" value="{{ search_query }}" placeholder="Search modules...">
+                                <label for="search">Search by name, code, or description</label>
+                            </div>
+                            <div class="input-field col s12 m3">
+                                <select name="category">
+                                    <option value="">All Categories</option>
+                                    {% for value, label in category_choices %}
+                                        <option value="{{ value }}" {% if value == selected_category %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <label>Category</label>
+                            </div>
+                            <div class="col s12 m3">
+                                <label>
+                                    <input type="checkbox" name="available" value="1" {% if available_only %}checked{% endif %} class="filled-in" />
+                                    <span>Available only</span>
+                                </label>
+                                <br><br>
+                                <button class="btn blue waves-effect waves-light" type="submit">
+                                    <i class="material-icons left">search</i>Search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modules Grid -->
+    <div class="row search-results">
+        {% if modules %}
+            {% for module in modules %}
+                <div class="col s12 m6 l4">
+                    <div class="card module-card hoverable">
+                        <div class="card-content">
+                            <span class="card-title">{{ module.name }}</span>
+                            <p><strong>Code:</strong> {{ module.code }}</p>
+                            <p><strong>Credits:</strong> {{ module.credits }}</p>
+                            <p><strong>Category:</strong> {{ module.get_category_display }}</p>
+                            <p>{{ module.description|truncatewords:15 }}</p>
+                            
+                            <div class="chip">
+                                <i class="material-icons left">people</i>
+                                {{ module.enrolled_students_count }}
+                                {% if module.max_students %}
+                                    / {{ module.max_students }}
+                                {% endif %}
+                                students
+                            </div>
+                        </div>
+                        <div class="card-action">
+                            <a href="{% url 'modules:detail' module.code %}" class="btn blue">View Details</a>
+                            {% if user.is_authenticated and module.can_register %}
+                                <a href="#" class="btn green register-btn right" data-module-code="{{ module.code }}">
+                                    Register
+                                </a>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Status Badge -->
+                        {% if module.is_available_for_registration and not module.is_full %}
+                            <span class="module-status status-active">Available</span>
+                        {% elif module.is_full %}
+                            <span class="module-status status-full">Full</span>
+                        {% else %}
+                            <span class="module-status status-inactive">Not Available</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col s12">
+                <div class="card">
+                    <div class="card-content center">
+                        <i class="material-icons large grey-text">search_off</i>
+                        <h5>No modules found</h5>
+                        <p>Try adjusting your search criteria or browse all available modules.</p>
+                        <a href="{% url 'modules:list' %}" class="btn blue">View All Modules</a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+        <div class="center">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li><a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if available_only %}&available=1{% endif %}"><i class="material-icons">first_page</i></a></li>
+                    <li><a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if available_only %}&available=1{% endif %}"><i class="material-icons">chevron_left</i></a></li>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="active"><a href="#!">{{ num }}</a></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li><a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if available_only %}&available=1{% endif %}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                    <li><a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if available_only %}&available=1{% endif %}"><i class="material-icons">chevron_right</i></a></li>
+                    <li><a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if available_only %}&available=1{% endif %}"><i class="material-icons">last_page</i></a></li>
+                {% endif %}
+            </ul>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

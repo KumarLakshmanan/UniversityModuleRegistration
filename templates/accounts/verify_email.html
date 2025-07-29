@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Verify Email - Course Registration{% endblock %}
+
+{% block extra_css %}
+<style>
+    .verification-container {
+        max-width: 500px;
+        margin: 50px auto;
+        padding: 20px;
+    }
+    .verification-card {
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .otp-input {
+        text-align: center;
+        font-size: 1.5rem;
+        letter-spacing: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container verification-container">
+    <div class="card verification-card">
+        <div class="card-content">
+            <div class="center-align">
+                <i class="material-icons large teal-text">email</i>
+                <h4 class="teal-text">Verify Your Email</h4>
+                <p class="grey-text">
+                    We've sent a 6-digit verification code to your email address.
+                    Please enter it below to verify your account.
+                </p>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="card-panel {{ message.tags }} lighten-4">
+                        <span class="{{ message.tags }}-text text-darken-2">{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" action="{% url 'accounts:verify_email' %}">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input type="email" id="email" name="email" class="validate" required>
+                        <label for="email">Email Address</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input type="text" id="otp_code" name="otp_code" class="validate otp-input" 
+                               maxlength="6" pattern="[0-9]{6}" required>
+                        <label for="otp_code">Verification Code</label>
+                        <span class="helper-text">Enter the 6-digit code sent to your email</span>
+                    </div>
+                </div>
+                <div class="row center-align">
+                    <button type="submit" class="btn teal waves-effect waves-light btn-large">
+                        <i class="material-icons left">verified_user</i>
+                        Verify Email
+                    </button>
+                </div>
+            </form>
+
+            <div class="divider" style="margin: 20px 0;"></div>
+
+            <div class="center-align">
+                <p class="grey-text">Didn't receive the code?</p>
+                <form method="post" action="{% url 'accounts:resend_verification' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="email" id="resend-email">
+                    <button type="submit" class="btn-flat teal-text waves-effect">
+                        <i class="material-icons left">refresh</i>
+                        Resend Code
+                    </button>
+                </form>
+            </div>
+
+            <div class="center-align" style="margin-top: 20px;">
+                <a href="{% url 'accounts:login' %}" class="btn-flat waves-effect">
+                    <i class="material-icons left">arrow_back</i>
+                    Back to Login
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-copy email to resend form
+    const emailInput = document.getElementById('email');
+    const resendEmailInput = document.getElementById('resend-email');
+    
+    emailInput.addEventListener('input', function() {
+        resendEmailInput.value = this.value;
+    });
+
+    // Auto-format OTP input
+    const otpInput = document.getElementById('otp_code');
+    otpInput.addEventListener('input', function() {
+        this.value = this.value.replace(/\D/g, '');
+    });
+});
+</script>
+{% endblock %}

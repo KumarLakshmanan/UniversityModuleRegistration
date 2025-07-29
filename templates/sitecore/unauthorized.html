@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Unauthorized Access - Course Module Registration System{% endblock %}
+
+{% block content %}
+<div class="container section">
+    <div class="row">
+        <div class="col s12 m8 offset-m2">
+            <div class="card">
+                <div class="card-content center">
+                    <i class="material-icons large red-text">block</i>
+                    <h4 class="red-text">Access Denied</h4>
+                    <p class="flow-text">
+                        You don't have permission to access this page. This could be because:
+                    </p>
+                    
+                    <ul class="left-align">
+                        <li>• You need to be logged in to view this content</li>
+                        <li>• Your account needs to be verified</li>
+                        <li>• You don't have the required permissions</li>
+                        <li>• The page you're looking for doesn't exist</li>
+                    </ul>
+                    
+                    <div class="section">
+                        {% if not user.is_authenticated %}
+                            <h5>Not logged in?</h5>
+                            <p>Please log in to your account to access student features.</p>
+                            <div class="row">
+                                <div class="col s12 m6">
+                                    <a href="{% url 'accounts:login' %}" class="btn blue waves-effect waves-light">
+                                        <i class="material-icons left">login</i>
+                                        Login
+                                    </a>
+                                </div>
+                                <div class="col s12 m6">
+                                    <a href="{% url 'accounts:register' %}" class="btn blue-text waves-effect waves-light">
+                                        <i class="material-icons left">person_add</i>
+                                        Register
+                                    </a>
+                                </div>
+                            </div>
+                        {% else %}
+                            {% if not user.student_profile.is_verified %}
+                                <h5>Account not verified?</h5>
+                                <p>Please verify your email address to access all features.</p>
+                                <a href="{% url 'accounts:verify_email' %}" class="btn orange waves-effect waves-light">
+                                    <i class="material-icons left">email</i>
+                                    Verify Email
+                                </a>
+                            {% else %}
+                                <h5>Need help?</h5>
+                                <p>If you believe this is an error, please contact support.</p>
+                                <a href="{% url 'sitecore:contact' %}" class="btn blue waves-effect waves-light">
+                                    <i class="material-icons left">help</i>
+                                    Contact Support
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="section">
+                        <h5>What would you like to do?</h5>
+                        <div class="row">
+                            <div class="col s12 m6">
+                                <a href="{% url 'sitecore:home' %}" class="btn-large blue-text waves-effect waves-light">
+                                    <i class="material-icons left">home</i>
+                                    Go Home
+                                </a>
+                            </div>
+                            <div class="col s12 m6">
+                                <a href="{% url 'modules:list' %}" class="btn-large blue-text waves-effect waves-light">
+                                    <i class="material-icons left">school</i>
+                                    Browse Modules
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

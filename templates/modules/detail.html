@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ module.name }} - Course Module Registration System{% endblock %}
+
+{% block content %}
+<div class="container section">
+    <!-- Module Header -->
+    <div class="row">
+        <div class="col s12">
+            <nav class="blue lighten-4">
+                <div class="nav-wrapper">
+                    <div class="col s12">
+                        <a href="{% url 'modules:list' %}" class="breadcrumb blue-text">Modules</a>
+                        <a href="#!" class="breadcrumb blue-text">{{ module.code }}</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col s12">
+            <h2 class="blue-text">{{ module.name }}</h2>
+            <p class="flow-text grey-text">{{ module.code }} | {{ module.credits }} Credits</p>
+        </div>
+    </div>
+    
+    <!-- Module Information -->
+    <div class="row">
+        <div class="col s12 m8">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">
+                        <i class="material-icons left">info</i>
+                        Module Information
+                    </span>
+                    
+                    <div class="row">
+                        <div class="col s12 m6">
+                            <h6><strong>Module Code</strong></h6>
+                            <p>{{ module.code }}</p>
+                        </div>
+                        <div class="col s12 m6">
+                            <h6><strong>Credits</strong></h6>
+                            <p>{{ module.credits }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col s12 m6">
+                            <h6><strong>Category</strong></h6>
+                            <p>{{ module.get_category_display }}</p>
+                        </div>
+                        <div class="col s12 m6">
+                            <h6><strong>Status</strong></h6>
+                            {% if module.is_available_for_registration and not module.is_full %}
+                                <span class="chip green white-text">Available</span>
+                            {% elif module.is_full %}
+                                <span class="chip red white-text">Full</span>
+                            {% else %}
+                                <span class="chip grey white-text">Not Available</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <h6 class="section"><strong>Description</strong></h6>
+                    <p>{{ module.description }}</p>
+                    
+                    {% if module.prerequisites %}
+                    <div class="divider"></div>
+                    <h6 class="section"><strong>Prerequisites</strong></h6>
+                    <p>{{ module.prerequisites }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Enrolled Students -->
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">
+                        <i class="material-icons left">people</i>
+                        Enrolled Students ({{ enrolled_count }})
+                    </span>
+                    
+                    {% if enrolled_students %}
+                        <div class="collection">
+                            {% for registration in enrolled_students %}
+                                <div class="collection-item avatar">
+                                    {% if registration.student.photo %}
+                                        <img src="{{ registration.student.photo.url }}" alt="" class="circle">
+                                    {% else %}
+                                        <i class="material-icons circle blue">person</i>
+                                    {% endif %}
+                                    <span class="title">{{ registration.student.get_full_name }}</span>
+                                    <p>Registered: {{ registration.date_registered|date:"M d, Y" }}<br>
+                                       Status: {{ registration.get_status_display }}
+                                    </p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="center">
+                            <i class="material-icons large grey-text">people_outline</i>
+                            <h6 class="grey-text">No students enrolled yet</h6>
+                            <p>Be the first to register for this module!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Registration Panel -->
+        <div class="col s12 m4">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">
+                        <i class="material-icons left">assignment</i>
+                        Registration
+                    </span>
+                    
+                    <!-- Enrollment Stats -->
+                    <div class="section">
+                        <div class="row">
+                            <div class="col s6">
+                                <div class="center">
+                                    <h4 class="blue-text">{{ enrolled_count }}</h4>
+                                    <p>Enrolled</p>
+                                </div>
+                            </div>
+                            <div class="col s6">
+                                <div class="center">
+                                    <h4 class="green-text">
+                                        {% if module.max_students %}
+                                            {{ module.available_spots|default:0 }}
+                                        {% else %}
+                                            ∞
+                                        {% endif %}
+                                    </h4>
+                                    <p>Available</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if module.max_students %}
+                        <div class="progress">
+                            <div class="determinate blue" style="width: {{ enrollment_percentage }}%"></div>
+                        </div>
+                        <p class="center">{{ enrolled_count }} of {{ module.max_students }} spots filled</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Registration Actions -->
+                    {% if user.is_authenticated %}
+                        {% if user_registered %}
+                            <div class="center">
+                                <span class="chip green white-text">
+                                    <i class="material-icons left">check</i>
+                                    Registered
+                                </span>
+                                <br><br>
+                                <button class="btn red unregister-btn" data-module-code="{{ module.code }}">
+                                    <i class="material-icons left">remove</i>
+                                    Unregister
+                                </button>
+                            </div>
+                        {% else %}
+                            {% if module.can_register %}
+                                <div class="center">
+                                    <button class="btn-large blue register-btn" data-module-code="{{ module.code }}">
+                                        <i class="material-icons left">add</i>
+                                        Register Now
+                                    </button>
+                                </div>
+                            {% else %}
+                                <div class="center">
+                                    <p class="red-text">Registration not available</p>
+                                    {% if module.is_full %}
+                                        <p>This module is full.</p>
+                                    {% else %}
+                                        <p>Registration is currently closed.</p>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    {% else %}
+                        <div class="center">
+                            <p>Please log in to register for this module.</p>
+                            <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn blue">
+                                <i class="material-icons left">login</i>
+                                Login
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Module Details Summary -->
+            <div class="card blue lighten-5">
+                <div class="card-content">
+                    <span class="card-title blue-text">
+                        <i class="material-icons left">info</i>
+                        Quick Facts
+                    </span>
+                    
+                    <div class="collection">
+                        <div class="collection-item">
+                            <strong>Code:</strong> {{ module.code }}
+                        </div>
+                        <div class="collection-item">
+                            <strong>Credits:</strong> {{ module.credits }}
+                        </div>
+                        <div class="collection-item">
+                            <strong>Category:</strong> {{ module.get_category_display }}
+                        </div>
+                        <div class="collection-item">
+                            <strong>Students:</strong> {{ enrolled_count }}{% if module.max_students %}/{{ module.max_students }}{% endif %}
+                        </div>
+                        <div class="collection-item">
+                            <strong>Status:</strong> 
+                            {% if module.can_register %}
+                                <span class="green-text">Open</span>
+                            {% else %}
+                                <span class="red-text">Closed</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Related Actions -->
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">
+                        <i class="material-icons left">more_horiz</i>
+                        More Actions
+                    </span>
+                    
+                    <div class="collection">
+                        <a href="{% url 'modules:list' %}" class="collection-item blue-text">
+                            <i class="material-icons left">arrow_back</i>
+                            Back to Modules
+                        </a>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'students:dashboard' %}" class="collection-item blue-text">
+                                <i class="material-icons left">dashboard</i>
+                                My Dashboard
+                            </a>
+                            <a href="{% url 'registrations:my_modules' %}" class="collection-item blue-text">
+                                <i class="material-icons left">list</i>
+                                My Registrations
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'sitecore:contact' %}" class="collection-item blue-text">
+                            <i class="material-icons left">help</i>
+                            Get Help
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

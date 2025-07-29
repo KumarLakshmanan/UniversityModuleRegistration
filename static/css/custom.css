@@ -1,0 +1,286 @@
+/* Custom styles for Course Module Registration System */
+
+/* General styles */
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+/* Messages */
+#messages {
+    position: fixed;
+    top: 64px;
+    right: 20px;
+    z-index: 1000;
+    width: 350px;
+}
+
+.close-message {
+    float: right;
+    cursor: pointer;
+}
+
+/* Hero section */
+.hero-section {
+    background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+    color: white;
+    padding: 60px 0;
+}
+
+.hero-section h1 {
+    margin-bottom: 20px;
+}
+
+.hero-section p {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+}
+
+/* Stats cards */
+.stats-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    margin: 10px 0;
+}
+
+.stats-card h3 {
+    font-size: 2.5em;
+    margin: 0;
+    color: #fff;
+}
+
+.stats-card p {
+    margin: 5px 0 0 0;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Module cards */
+.module-card {
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.module-card .card-content {
+    flex-grow: 1;
+}
+
+.module-card .card-action {
+    margin-top: auto;
+}
+
+.module-status {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.status-active {
+    background-color: #4caf50;
+    color: white;
+}
+
+.status-inactive {
+    background-color: #f44336;
+    color: white;
+}
+
+.status-full {
+    background-color: #ff9800;
+    color: white;
+}
+
+/* Profile page */
+.profile-photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 20px auto;
+    display: block;
+}
+
+.profile-info {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Dashboard cards */
+.dashboard-card {
+    margin: 20px 0;
+}
+
+.dashboard-stat {
+    text-align: center;
+    padding: 20px;
+}
+
+.dashboard-stat h4 {
+    color: #1e88e5;
+    margin-bottom: 10px;
+}
+
+/* Form styles */
+.form-container {
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.input-field label {
+    color: #9e9e9e;
+}
+
+.input-field input:focus + label {
+    color: #1e88e5 !important;
+}
+
+.input-field input:focus {
+    border-bottom: 1px solid #1e88e5 !important;
+    box-shadow: 0 1px 0 0 #1e88e5 !important;
+}
+
+/* Responsive adjustments */
+@media only screen and (max-width: 992px) {
+    .hero-section {
+        padding: 40px 0;
+    }
+    
+    .hero-section h1 {
+        font-size: 2.5em;
+    }
+    
+    .stats-card h3 {
+        font-size: 2em;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    #messages {
+        width: calc(100% - 40px);
+        right: 20px;
+    }
+    
+    .hero-section {
+        padding: 30px 0;
+    }
+    
+    .hero-section h1 {
+        font-size: 2em;
+    }
+    
+    .form-container {
+        margin: 20px auto;
+        padding: 15px;
+    }
+}
+
+/* Loading and animation effects */
+.loading {
+    text-align: center;
+    padding: 40px;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Module search */
+.search-container {
+    margin: 30px 0;
+}
+
+.search-results {
+    margin-top: 20px;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin: 40px 0;
+}
+
+.pagination li {
+    display: inline-block;
+    margin: 0 5px;
+}
+
+.pagination li a {
+    padding: 8px 16px;
+    background-color: #f5f5f5;
+    color: #333;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.pagination li a:hover,
+.pagination li.active a {
+    background-color: #1e88e5;
+    color: white;
+}
+
+/* Registration status badges */
+.registration-badge {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.badge-enrolled {
+    background-color: #4caf50;
+    color: white;
+}
+
+.badge-completed {
+    background-color: #2196f3;
+    color: white;
+}
+
+.badge-withdrawn {
+    background-color: #f44336;
+    color: white;
+}
+
+/* Utility classes */
+.text-center {
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+.p-20 {
+    padding: 20px;
+}
