@@ -53,21 +53,28 @@ class SystemStats(models.Model):
     total_modules = models.PositiveIntegerField(default=0)
     total_registrations = models.PositiveIntegerField(default=0)
     active_modules = models.PositiveIntegerField(default=0)
+    active_registrations = models.PositiveIntegerField(default=0)
+    completed_registrations = models.PositiveIntegerField(default=0)
     
     # Timestamps
+    date_recorded = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "System Statistics"
         verbose_name_plural = "System Statistics"
+        ordering = ['-date_recorded']
 
     def __str__(self):
-        return f"System Stats - Last Updated: {self.last_updated}"
+        return f"Stats for {self.date_recorded.strftime('%Y-%m-%d')}"
 
     @classmethod
     def get_latest_stats(cls):
         """Get the latest system statistics."""
-        stats, created = cls.objects.get_or_create(pk=1)
+        stats = cls.objects.first()
+        if not stats:
+            stats = cls.objects.create()
+            stats.update_stats()
         return stats
 
     def update_stats(self):
@@ -78,9 +85,15 @@ class SystemStats(models.Model):
         
         self.total_students = Student.objects.filter(is_verified=True).count()
         self.total_modules = Module.objects.filter(status='active').count()
-        self.total_registrations = Registration.objects.filter(is_active=True).count()
+        self.total_registrations = Registration.objects.count()
         self.active_modules = Module.objects.filter(
             status='active', 
             is_available_for_registration=True
+        ).count()
+        self.active_registrations = Registration.objects.filter(
+            status='enrolled', is_active=True
+        ).count()
+        self.completed_registrations = Registration.objects.filter(
+            status='completed'
         ).count()
         self.save()

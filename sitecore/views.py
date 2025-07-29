@@ -61,15 +61,15 @@ class ContactView(TemplateView):
         # Validate required fields
         errors = {}
         if not name:
-            errors['name'] = 'Name is required'
+            errors['name'] = 'This field is required'
         if not email:
-            errors['email'] = 'Email is required'
+            errors['email'] = 'This field is required'
         elif '@' not in email:
             errors['email'] = 'Please enter a valid email address'
         if not subject:
-            errors['subject'] = 'Subject is required'
+            errors['subject'] = 'This field is required'
         if not message:
-            errors['message'] = 'Message is required'
+            errors['message'] = 'This field is required'
         
         # Handle AJAX requests
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':

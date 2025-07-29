@@ -114,11 +114,11 @@ class ProfileEditView(LoginRequiredMixin, TemplateView):
         
         # Required field validation
         if not first_name:
-            errors.append('First name is required')
+            errors.append('This field is required')
         if not last_name:
-            errors.append('Last name is required')
+            errors.append('This field is required')
         if not email:
-            errors.append('Email is required')
+            errors.append('This field is required')
         elif '@' not in email:
             errors.append('Please enter a valid email address')
         
@@ -150,6 +150,8 @@ class ProfileEditView(LoginRequiredMixin, TemplateView):
             # Handle photo upload
             if 'photo' in request.FILES:
                 student.photo = request.FILES['photo']
+            elif 'profile_picture' in request.FILES:
+                student.photo = request.FILES['profile_picture']
             
             student.save()
             

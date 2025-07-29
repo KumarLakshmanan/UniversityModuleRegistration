@@ -321,13 +321,12 @@ class SystemStatsModelTestCase(TestCase):
         # Create inactive module
         inactive_module = Module.objects.create(
             code='OLD101',
-            title='Old Course',
+            name='Old Course',
             description='Inactive course',
             credits=2,
-            category='Other',
-            instructor='Dr. Old',
+            category='core',
             max_students=20,
-            is_active=False
+            status='inactive'
         )
         
         # Create withdrawn registration
