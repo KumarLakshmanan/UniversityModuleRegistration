@@ -4,41 +4,84 @@
 
 {% block content %}
 <div class="container py-5">
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <h1 class="text-center mb-5">About Our University</h1>
+    <!-- Section 1: University Introduction -->
+    <div class="row mb-5">
+        <div class="col-lg-12 text-center mb-5">
+            <h1 class="fade-in-up">About Our University</h1>
+            <p class="lead text-muted fade-in-up">Lorem ipsum dolor sit amet consectetur adipiscing elit</p>
+        </div>
+    </div>
+    
+    <div class="row align-items-center mb-5">
+        <div class="col-md-6">
+            <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=500&h=400&fit=crop&crop=center" alt="University Campus" class="img-fluid rounded shadow fade-in-up">
+        </div>
+        <div class="col-md-6 fade-in-up">
+            <h3>Our Institution</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
             
-            <div class="row mb-5">
-                <div class="col-md-6">
-                    <img src="https://via.placeholder.com/500x300/0d6efd/ffffff?text=University+Campus" alt="University Campus" class="img-fluid rounded shadow">
-                </div>
-                <div class="col-md-6">
-                    <h3>Our Mission</h3>
-                    <p>To provide world-class education and foster innovation through cutting-edge technology and comprehensive module management systems.</p>
-                    
-                    <h3>Our Vision</h3>
-                    <p>To be the leading educational institution that empowers students with knowledge, skills, and opportunities for a successful future.</p>
-                </div>
-            </div>
-            
+            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </div>
+    </div>
+
+    <!-- Section 2: Mission & Vision -->
+    <section class="py-5 bg-light rounded mb-5">
+        <div class="container">
             <div class="row">
-                <div class="col-md-4 text-center mb-4">
-                    <i class="fas fa-graduation-cap fa-3x text-primary mb-3"></i>
-                    <h4>Excellence in Education</h4>
-                    <p>Committed to providing high-quality education with innovative teaching methods and comprehensive curriculum.</p>
+                <div class="col-lg-6 mb-4">
+                    <div class="text-center fade-in-up">
+                        <img src="https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=300&h=200&fit=crop&crop=center" alt="Mission" class="img-fluid rounded mb-3">
+                        <h3>Our Mission</h3>
+                        <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+                    </div>
                 </div>
-                <div class="col-md-4 text-center mb-4">
-                    <i class="fas fa-users fa-3x text-primary mb-3"></i>
-                    <h4>Student-Centered</h4>
-                    <p>Our students are at the heart of everything we do, with personalized support and modern learning environments.</p>
-                </div>
-                <div class="col-md-4 text-center mb-4">
-                    <i class="fas fa-globe fa-3x text-primary mb-3"></i>
-                    <h4>Global Perspective</h4>
-                    <p>Preparing students for a globalized world with diverse perspectives and international collaboration opportunities.</p>
+                <div class="col-lg-6 mb-4">
+                    <div class="text-center fade-in-up">
+                        <img src="https://images.unsplash.com/photo-1562774053-701939374585?w=300&h=200&fit=crop&crop=center" alt="Vision" class="img-fluid rounded mb-3">
+                        <h3>Our Vision</h3>
+                        <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est.</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Section 3: Why Choose Us -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center mb-5">
+                    <h2 class="fade-in-up">Why Choose Us</h2>
+                    <p class="lead text-muted fade-in-up">At vero eos et accusamus et iusto odio dignissimos</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 text-center mb-4">
+                    <div class="fade-in-up">
+                        <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=150&h=150&fit=crop&crop=center" alt="Excellence" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                        <i class="fas fa-graduation-cap fa-3x text-primary mb-3 d-block"></i>
+                        <h4>Excellence in Education</h4>
+                        <p>Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center mb-4">
+                    <div class="fade-in-up">
+                        <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?w=150&h=150&fit=crop&crop=center" alt="Student Focus" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                        <i class="fas fa-users fa-3x text-primary mb-3 d-block"></i>
+                        <h4>Student-Centered</h4>
+                        <p>Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center mb-4">
+                    <div class="fade-in-up">
+                        <img src="https://images.unsplash.com/photo-1488751045188-3c55bbf9a3fa?w=150&h=150&fit=crop&crop=center" alt="Global Perspective" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                        <i class="fas fa-globe fa-3x text-primary mb-3 d-block"></i>
+                        <h4>Global Perspective</h4>
+                        <p>Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 {% endblock %}

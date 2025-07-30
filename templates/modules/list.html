@@ -35,13 +35,14 @@
         {% for module in modules %}
         <div class="col-lg-4 col-md-6 mb-4">
             <div class="card module-card h-100">
+                <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=200&fit=crop&crop=center&auto=format&q=60" class="card-img-top" alt="{{ module.name }}" style="height: 200px; object-fit: cover;">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span class="module-code">{{ module.code }}</span>
                     <span class="module-category">{{ module.get_category_display }}</span>
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">{{ module.name }}</h5>
-                    <p class="card-text">{{ module.description|truncatewords:20 }}</p>
+                    <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt...</p>
                     
                     <div class="row text-center mb-3">
                         <div class="col-4">

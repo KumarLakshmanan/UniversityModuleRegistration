@@ -155,6 +155,12 @@ class StudentLoginView(LoginView):
     def form_valid(self, form):
         user = form.get_user()
 
+        # Prevent admin/staff login on student portal
+        if user.is_staff or user.is_superuser:
+            messages.error(
+                self.request, 'Admin users cannot login through the student portal. Please use the admin panel.')
+            return self.form_invalid(form)
+
         # Check if user's email is verified
         if hasattr(user, 'student') and not user.student.is_email_verified:
             messages.warning(

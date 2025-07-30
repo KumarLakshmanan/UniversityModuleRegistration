@@ -6,6 +6,7 @@ from django.conf import settings
 from django.db.models import Count
 from students.models import Student
 from modules.models import Module, Registration
+from .models import Contact
 import requests
 
 
@@ -41,6 +42,14 @@ class ContactView(TemplateView):
         
         if all([name, email, subject, message]):
             try:
+                # Save to database
+                contact = Contact.objects.create(
+                    name=name,
+                    email=email,
+                    subject=subject,
+                    message=message
+                )
+                
                 # Send email (if email is configured)
                 if settings.EMAIL_HOST_USER:
                     send_mail(

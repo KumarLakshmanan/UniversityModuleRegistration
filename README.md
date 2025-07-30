@@ -245,3 +245,33 @@ Develop a **monolithic Django web application** for managing student registratio
 7. Use Django admin for staff CRUD operations on all models.
 8. Consistent templates and navigation throughout.
 9. Document Azure deployment, admin setup, and end-user guidance.
+
+
+
+in the home page 4 sections needed.
+and in about page 3 sections needed.
+
+in the modules image is needed. 
+use picsum for placeholder images.
+like. https://picsum.photos/200/300
+
+and remove all the description content. and replace it with the lorem ipsum text.
+
+and also use all the images used in the home and about pages into picsum images.
+
+and also change the design layout of the footer. and make it a new design layout. instead of traditional layout, use a more modern and sleek design.
+
+and do not login admin in the
+http://127.0.0.1:8000/auth/login/ page
+
+and in the admin login please show all the details of form submits
+http://127.0.0.1:8000/admin/
+because now the contacts are not showing
+
+and connect sql database with the below credentials
+username -> 'root'
+password -> ''
+database -> 'module_registration_v1'
+host -> 'localhost'
+
+and migrate the database and seed initial data into mysql database.

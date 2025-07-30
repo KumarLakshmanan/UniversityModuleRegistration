@@ -119,36 +119,74 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-dark text-light py-5 mt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4">
-                    <h5><i class="fas fa-graduation-cap me-2"></i>University Portal</h5>
-                    <p>Your gateway to academic excellence and module registration.</p>
-                </div>
-                <div class="col-lg-4">
-                    <h5>Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="{% url 'core:home' %}" class="text-light text-decoration-none">Home</a></li>
-                        <li><a href="{% url 'modules:list' %}" class="text-light text-decoration-none">Modules</a></li>
-                        <li><a href="{% url 'core:about' %}" class="text-light text-decoration-none">About</a></li>
-                        <li><a href="{% url 'core:contact' %}" class="text-light text-decoration-none">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-4">
-                    <h5>Contact Info</h5>
-                    <p><i class="fas fa-map-marker-alt me-2"></i>University Campus, Education City</p>
-                    <p><i class="fas fa-phone me-2"></i>+1 (555) 123-4567</p>
-                    <p><i class="fas fa-envelope me-2"></i>info@university.edu</p>
+    <footer class="modern-footer bg-dark text-light">
+        <div class="footer-content py-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4 mb-4">
+                        <div class="footer-brand">
+                            <i class="fas fa-graduation-cap me-2 fs-3"></i>
+                            <h4 class="d-inline">University Portal</h4>
+                        </div>
+                        <p class="footer-description mt-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                        <div class="social-links mt-4">
+                            <a href="#" class="social-link me-3"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social-link me-3"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="social-link me-3"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="social-link me-3"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 mb-4">
+                        <h5 class="footer-title">Quick Links</h5>
+                        <ul class="footer-links">
+                            <li><a href="{% url 'core:home' %}">Home</a></li>
+                            <li><a href="{% url 'modules:list' %}">Modules</a></li>
+                            <li><a href="{% url 'core:about' %}">About</a></li>
+                            <li><a href="{% url 'core:contact' %}">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-md-6 mb-4">
+                        <h5 class="footer-title">Student Portal</h5>
+                        <ul class="footer-links">
+                            {% if user.is_authenticated %}
+                                <li><a href="{% url 'students:dashboard' %}">Dashboard</a></li>
+                                <li><a href="{% url 'students:profile' %}">Profile</a></li>
+                                <li><a href="{% url 'students:my_modules' %}">My Modules</a></li>
+                            {% else %}
+                                <li><a href="{% url 'students:login' %}">Login</a></li>
+                                <li><a href="{% url 'students:register' %}">Register</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div class="col-lg-4 mb-4">
+                        <h5 class="footer-title">Contact Info</h5>
+                        <div class="contact-info">
+                            <div class="contact-item mb-3">
+                                <i class="fas fa-map-marker-alt me-3"></i>
+                                <span>University Campus, Education City</span>
+                            </div>
+                            <div class="contact-item mb-3">
+                                <i class="fas fa-phone me-3"></i>
+                                <span>+1 (555) 123-4567</span>
+                            </div>
+                            <div class="contact-item mb-3">
+                                <i class="fas fa-envelope me-3"></i>
+                                <span>info@university.edu</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <hr class="my-4">
-            <div class="row">
-                <div class="col-md-6">
-                    <p>&copy; 2025 University Module Registration System. All rights reserved.</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <p>Powered by Django & Azure Cloud</p>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="row align-items-center py-3">
+                    <div class="col-md-6">
+                        <p class="mb-0">&copy; 2025 University Module Registration System. All rights reserved.</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <span class="powered-by">Powered by <i class="fab fa-aws"></i> Django & Azure Cloud</span>
+                    </div>
                 </div>
             </div>
         </div>

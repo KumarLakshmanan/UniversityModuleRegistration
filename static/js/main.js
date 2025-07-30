@@ -1,3 +1,4 @@
+// Materialize is not used; all initialization removed.
 // Custom JavaScript for University Module Registration System
 
 $(document).ready(function() {
