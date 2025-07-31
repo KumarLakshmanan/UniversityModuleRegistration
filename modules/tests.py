@@ -14,8 +14,7 @@ class ModulesTestCase(TestCase):
             code='CS101',
             description='Basic programming concepts',
             credits=3,
-            category='CORE',
-            semester='fall_2024'
+            category='CORE'
         )
         self.user = User.objects.create_user(
             username='testuser',
@@ -47,8 +46,7 @@ class ModuleModelTestCase(TestCase):
             code='CS201',
             description='Study of data structures',
             credits=4,
-            category='CORE',
-            semester='spring_2025'
+            category='CORE'
         )
         
         self.assertEqual(str(module), 'CS201 - Data Structures')
@@ -61,8 +59,7 @@ class ModuleModelTestCase(TestCase):
             code='CS301',
             description='Advanced study of data structures',
             credits=4,
-            category='CORE',
-            semester='fall_2024'
+            category='CORE'
         )
         
         self.assertEqual(module.code, 'CS301')
@@ -76,8 +73,7 @@ class ModuleViewsTestCase(TestCase):
             code='CS101',
             description='Test module description',
             credits=3,
-            category='CORE',
-            semester='fall_2024'
+            category='CORE'
         )
 
     def test_module_list_page_renders(self):

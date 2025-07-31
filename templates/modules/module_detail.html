@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ module.title }} - Module Details{% endblock %}
+{% block title %}{{ module.name }} - Module Details{% endblock %}
 
 {% block extra_css %}
 <style>
     .module-hero {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
     }
     .info-card {
         transition: all 0.3s ease;
@@ -23,20 +23,22 @@
 
 {% block content %}
 <!-- Module Hero Section -->
-<div class="module-hero text-white py-16">
-    <div class="container mx-auto px-4">
+<div class="relative bg-gradient-to-r from-red-600 to-red-800 text-white rounded-lg overflow-hidden mb-8">
+    <div class="absolute inset-0">
+        <img src="{{ module.get_image_url }}" 
+             alt="{{ module.name }}" 
+             class="w-full h-full object-cover opacity-30">
+    </div>
+    <div class="relative z-10 py-16 px-8">
         <div class="max-w-4xl mx-auto text-center">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ module.title }}</h1>
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ module.name }}</h1>
             <p class="text-xl opacity-90 mb-6">{{ module.code }}</p>
             <div class="flex flex-wrap justify-center gap-4 text-sm">
                 <span class="bg-white bg-opacity-20 px-3 py-1 rounded-full">
-                    {{ module.department.name }}
+                    {{ module.get_category_display }}
                 </span>
                 <span class="bg-white bg-opacity-20 px-3 py-1 rounded-full">
                     {{ module.credits }} Credits
-                </span>
-                <span class="bg-white bg-opacity-20 px-3 py-1 rounded-full">
-                    {{ module.semester }}
                 </span>
             </div>
         </div>
@@ -164,12 +166,8 @@
                             <span class="font-medium">{{ module.credits }}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-600">Semester:</span>
-                            <span class="font-medium">{{ module.semester }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Department:</span>
-                            <span class="font-medium">{{ module.department.name }}</span>
+                            <span class="text-gray-600">Category:</span>
+                            <span class="font-medium">{{ module.get_category_display }}</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600">Enrolled Students:</span>

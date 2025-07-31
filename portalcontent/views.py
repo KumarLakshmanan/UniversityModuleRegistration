@@ -12,8 +12,8 @@ import json
 
 def home_view(request):
     """Home page view"""
-    site_config = SiteConfiguration.objects.filter(is_active=True).first()
-    news_updates = NewsUpdate.objects.filter(is_published=True)[:3]
+    site_config = SiteConfiguration.get_site_config()
+    news_updates = NewsUpdate.published.all()[:3]
     
     # Add stats for the home page
     stats = {
@@ -32,7 +32,7 @@ def home_view(request):
 
 def about_view(request):
     """About page view"""
-    site_config = SiteConfiguration.objects.filter(is_active=True).first()
+    site_config = SiteConfiguration.get_site_config()
     
     context = {
         'site_config': site_config,
@@ -43,7 +43,7 @@ def about_view(request):
 @csrf_protect
 def contact_view(request):
     """Contact page view"""
-    site_config = SiteConfiguration.objects.filter(is_active=True).first()
+    site_config = SiteConfiguration.get_site_config()
     
     if request.method == 'POST':
         # Handle form submission

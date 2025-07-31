@@ -10,19 +10,13 @@ class Module(models.Model):
         ('SPECIALIZED', 'Specialized'),
     ]
     
-    SEMESTER_CHOICES = [
-        ('fall_2024', 'Fall 2024'),
-        ('spring_2025', 'Spring 2025'),
-        ('summer_2025', 'Summer 2025'),
-        ('fall_2025', 'Fall 2025'),
-    ]
-    
     name = models.CharField(max_length=200)
     code = models.SlugField(max_length=20, unique=True)
-    description = models.TextField()
+    description = models.TextField(default="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.")
+    image_url = models.URLField(max_length=500, blank=True, null=True, help_text="URL for module image (e.g., from Unsplash)")
     credits = models.PositiveIntegerField(default=3)
+    max_students = models.PositiveIntegerField(default=50, help_text="Maximum number of students that can register for this module")
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='CORE')
-    semester = models.CharField(max_length=20, choices=SEMESTER_CHOICES, default='fall_2024')
     prerequisites = models.ManyToManyField('self', blank=True, symmetrical=False)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -30,6 +24,19 @@ class Module(models.Model):
     
     def __str__(self):
         return f"{self.code} - {self.name}"
+    
+    def get_image_url(self):
+        """Get image URL with fallback to default"""
+        if self.image_url:
+            return self.image_url
+        # Default images based on category
+        default_images = {
+            'CORE': 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+            'ELECTIVE': 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+            'OPTIONAL': 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+            'SPECIALIZED': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+        }
+        return default_images.get(self.category, default_images['CORE'])
     
     def save(self, *args, **kwargs):
         if not self.code:

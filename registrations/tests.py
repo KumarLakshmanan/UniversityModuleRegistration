@@ -15,8 +15,7 @@ class RegistrationsTestCase(TestCase):
             code='CS101',
             description='Basic programming concepts',
             credits=3,
-            category='CORE',
-            semester='fall_2024'
+            category='CORE'
         )
         self.user = User.objects.create_user(
             username='testuser',
@@ -53,7 +52,8 @@ class RegistrationsTestCase(TestCase):
             'module_id': self.module.pk
         })
         
-        self.assertEqual(response.status_code, 401)
+        # DRF with session authentication returns 403 for unauthenticated users
+        self.assertEqual(response.status_code, 403)
 
     def test_module_registration_already_registered(self):
         """Test registration when already registered"""
@@ -73,8 +73,12 @@ class RegistrationsTestCase(TestCase):
 
     def test_module_registration_module_full(self):
         """Test registration when module is full"""
-        # Fill up the module
-        for i in range(2):
+        # Set module capacity to 3 for this test
+        self.module.max_students = 3
+        self.module.save()
+        
+        # Fill up the module (create 3 registrations, module is now full)
+        for i in range(3):
             user = User.objects.create_user(
                 username=f'user{i+2}',
                 email=f'user{i+2}@example.com',
@@ -87,6 +91,7 @@ class RegistrationsTestCase(TestCase):
             )
             Registration.objects.create(student=student, module=self.module)
         
+        # Try to register one more student (should fail)
         self.client.force_login(self.user)
         
         response = self.client.post('/api/registrations/', {
@@ -139,7 +144,8 @@ class RegistrationsTestCase(TestCase):
         
         response = self.client.delete(f'/api/registrations/{registration.pk}/')
         
-        self.assertEqual(response.status_code, 403)
+        # Should return 404 since the user can't see registrations they don't own
+        self.assertEqual(response.status_code, 404)
 
     def test_get_user_registrations(self):
         """Test getting user's registrations"""
@@ -148,8 +154,7 @@ class RegistrationsTestCase(TestCase):
             name='Data Structures',
             code='CS201',
             description='Data structures course',
-            credits=4,
-            semester='fall_2024'
+            credits=4
         )
         
         Registration.objects.create(student=self.student, module=self.module)
@@ -166,7 +171,8 @@ class RegistrationsTestCase(TestCase):
     def test_get_user_registrations_unauthenticated(self):
         """Test getting registrations for unauthenticated user"""
         response = self.client.get('/api/registrations/my_registrations/')
-        self.assertEqual(response.status_code, 401)
+        # DRF with session authentication returns 403 for unauthenticated users
+        self.assertEqual(response.status_code, 403)
 
     def test_registration_status_tracking(self):
         """Test registration status tracking"""
@@ -192,8 +198,7 @@ class RegistrationsTestCase(TestCase):
             name='Advanced Programming',
             code='CS301',
             description='Advanced course',
-            credits=4,
-            semester='spring_2025'
+            credits=4
         )
         
         reg2 = Registration.objects.create(
@@ -219,8 +224,7 @@ class RegistrationModelTestCase(TestCase):
             code='CS101',
             description='Test module',
             credits=3,
-            category='CORE',
-            semester='fall_2024'
+            category='CORE'
         )
         self.user = User.objects.create_user(
             username='testuser',
@@ -292,8 +296,7 @@ class RegistrationModelTestCase(TestCase):
             name='Another Module',
             code='CS102',
             description='Another test module',
-            credits=3,
-            semester='fall_2024'
+            credits=3
         )
         
         reg2 = Registration.objects.create(
@@ -316,8 +319,7 @@ class RegistrationViewsTestCase(TestCase):
             code='CS101',
             description='Test module',
             credits=3,
-            category='CORE',
-            semester='fall_2024'
+            category='CORE'
         )
         self.user = User.objects.create_user(
             username='testuser',
@@ -367,8 +369,7 @@ class RegistrationAPITestCase(TestCase):
             code='CS999',
             description='Module for API testing',
             credits=3,
-            category='CORE',
-            semester='fall_2024'
+            category='CORE'
         )
         self.user = User.objects.create_user(
             username='apiuser',
@@ -428,4 +429,11 @@ class RegistrationAPITestCase(TestCase):
                                    data=json.dumps({'module_id': self.module.pk, 'student_id': other_student.pk}),
                                    content_type='application/json')
         
-        self.assertEqual(response.status_code, 403)
+        # The API should create a registration for the current user, not the other student
+        # So it should succeed but ignore the student_id parameter
+        self.assertEqual(response.status_code, 201)
+        
+        # Verify the registration was created for the current user, not the other student
+        registration = Registration.objects.get(module=self.module)
+        self.assertEqual(registration.student, self.student)
+        self.assertNotEqual(registration.student, other_student)

@@ -193,3 +193,9 @@ def profile_view(request):
         'student': student
     }
     return render(request, 'accounts/profile.html', context)
+
+
+def admin_login_blocked(request):
+    """Block admin login via /auth/login/ - redirect to unauthorized page"""
+    messages.warning(request, 'Admin login via this URL is not allowed. Please use the admin panel directly.')
+    return redirect('portalcontent:unauthorized')

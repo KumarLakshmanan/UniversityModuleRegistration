@@ -31,7 +31,7 @@ class StudentSerializer(serializers.ModelSerializer):
 class ModuleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Module
-        fields = ['id', 'code', 'name', 'description', 'credits', 'semester', 
+        fields = ['id', 'code', 'name', 'description', 'credits', 'category', 
                  'prerequisites', 'is_active']
         read_only_fields = ['id']
 
@@ -58,6 +58,15 @@ class RegistrationSerializer(serializers.ModelSerializer):
         except (Student.DoesNotExist, Module.DoesNotExist):
             raise serializers.ValidationError("Invalid student or module ID")
         
+        # Check if already registered
+        if Registration.objects.filter(student=student, module=module).exists():
+            raise serializers.ValidationError("Already registered for this module")
+        
+        # Check if module is full
+        current_registrations = Registration.objects.filter(module=module).count()
+        if current_registrations >= module.max_students:
+            raise serializers.ValidationError("Module is full")
+            
         validated_data['student'] = student
         validated_data['module'] = module
         
@@ -113,15 +122,37 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return user
 
 
+class UserProfileSerializer(serializers.ModelSerializer):
+    """Serializer for updating user profile info (no password required)"""
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name']
+        read_only_fields = ['username']  # Don't allow username changes
+
+
 class StudentProfileSerializer(serializers.ModelSerializer):
-    user = UserRegistrationSerializer()
+    user = UserProfileSerializer()
+    profile_picture = serializers.ImageField(required=False, allow_null=True)
     
     class Meta:
         model = Student
-        fields = ['user', 'student_id', 'phone_number', 'date_of_birth', 'address']
+        fields = ['user', 'student_id', 'phone_number', 'date_of_birth', 'address', 'profile_picture']
     
     def create(self, validated_data):
         user_data = validated_data.pop('user')
         user = UserRegistrationSerializer().create(user_data)
         student = Student.objects.create(user=user, **validated_data)
         return student
+    
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', None)
+        if user_data:
+            user_serializer = UserProfileSerializer(instance.user, data=user_data, partial=True)
+            if user_serializer.is_valid():
+                user_serializer.save()
+        
+        # Update student fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance

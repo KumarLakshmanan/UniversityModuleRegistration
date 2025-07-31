@@ -59,23 +59,12 @@ class ModuleViewSet(viewsets.ModelViewSet):
     
     def get_permissions(self):
         # Public can view modules, only staff can create, update, delete
-        if self.action in ['list', 'retrieve', 'by_semester']:
+        if self.action in ['list', 'retrieve']:
             permission_classes = [AllowAny]
         else:
             permission_classes = [IsAuthenticated]
             # You might want to add custom staff permission here
         return [permission() for permission in permission_classes]
-    
-    @action(detail=False, methods=['get'])
-    def by_semester(self, request):
-        """Get modules by semester"""
-        semester = request.query_params.get('semester')
-        if semester:
-            modules = self.queryset.filter(semester=semester)
-            serializer = self.get_serializer(modules, many=True)
-            return Response(serializer.data)
-        return Response({'error': 'Semester parameter required'}, 
-                       status=status.HTTP_400_BAD_REQUEST)
 
 
 class RegistrationViewSet(viewsets.ModelViewSet):
@@ -119,6 +108,12 @@ class RegistrationViewSet(viewsets.ModelViewSet):
         try:
             student = Student.objects.get(user=request.user)
             registrations = Registration.objects.filter(student=student)
+            
+            # Filter by status if provided
+            status_filter = request.query_params.get('status')
+            if status_filter:
+                registrations = registrations.filter(status=status_filter)
+            
             serializer = self.get_serializer(registrations, many=True)
             return Response(serializer.data)
         except Student.DoesNotExist:
@@ -602,7 +597,28 @@ class StudentProfileView(views.APIView):
         """Update student profile for current user"""
         try:
             student = Student.objects.get(user=request.user)
-            serializer = StudentProfileSerializer(student, data=request.data, partial=True)
+            data = request.data.copy()
+            if request.FILES:
+                data['profile_picture'] = request.FILES.get('profile_picture')
+            serializer = StudentProfileSerializer(student, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Student.DoesNotExist:
+            return Response(
+                {'error': 'Student profile not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+    def patch(self, request):
+        """Partially update student profile for current user (supports file upload)"""
+        try:
+            student = Student.objects.get(user=request.user)
+            data = request.data.copy()
+            if request.FILES:
+                data['profile_picture'] = request.FILES.get('profile_picture')
+            serializer = StudentProfileSerializer(student, data=data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
@@ -733,6 +749,30 @@ def unregister_from_module(request, module_id):
             {'error': 'Module not found'}, 
             status=status.HTTP_404_NOT_FOUND
         )
+    except Student.DoesNotExist:
+        return Response(
+            {'error': 'Student profile not found'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def upload_profile_photo(request):
+    """Upload profile photo for current user"""
+    try:
+        student = Student.objects.get(user=request.user)
+        if 'profile_picture' not in request.FILES:
+            return Response(
+                {'error': 'No file provided'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        student.profile_picture = request.FILES['profile_picture']
+        student.save()
+        
+        serializer = StudentProfileSerializer(student)
+        return Response(serializer.data)
     except Student.DoesNotExist:
         return Response(
             {'error': 'Student profile not found'}, 

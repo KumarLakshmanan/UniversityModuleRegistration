@@ -27,6 +27,7 @@ urlpatterns = [
     
     # Student APIs
     path('profile/', views.StudentProfileView.as_view(), name='profile'),
+    path('profile/photo/', views.upload_profile_photo, name='upload_profile_photo'),
     path('dashboard/', views.DashboardView.as_view(), name='dashboard'),
     path('my-modules/', views.MyModulesView.as_view(), name='my_modules'),
     

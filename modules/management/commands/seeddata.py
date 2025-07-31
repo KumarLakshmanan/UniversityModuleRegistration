@@ -39,11 +39,11 @@ class Command(BaseCommand):
         if not SiteConfiguration.objects.exists():
             config = SiteConfiguration.objects.create(
                 site_name="University Module Registration System",
-                site_description="A comprehensive module registration system for university students to browse, register, and manage their academic modules.",
+                site_description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
                 contact_email="info@university.edu",
                 contact_phone="+1-555-123-4567",
                 address="123 University Ave, Academic City, State 12345",
-                about_content="Our university has been providing quality education for over 50 years. The Module Registration System is designed to streamline the course selection process and enhance the academic experience for all students.",
+                about_content="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
                 is_active=True
             )
             self.stdout.write(f'Created site configuration: {config.site_name}')
@@ -54,23 +54,24 @@ class Command(BaseCommand):
             {
                 'code': 'CS101',
                 'name': 'Introduction to Computer Science',
-                'description': 'Fundamental concepts of computer science including programming basics, algorithms, and data structures.',
+                'description': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+                'image_url': 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
                 'credits': 3,
-                'category': 'CORE',
-                'semester': 'fall_2024'
+                'category': 'CORE'
             },
             {
                 'code': 'CS201',
                 'name': 'Data Structures and Algorithms',
-                'description': 'Advanced study of data structures, algorithm design, and complexity analysis.',
+                'description': 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+                'image_url': 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
                 'credits': 4,
-                'category': 'CORE',
-                'semester': 'spring_2025'
+                'category': 'CORE'
             },
             {
                 'code': 'CS301',
                 'name': 'Database Systems',
-                'description': 'Design and implementation of database systems, SQL, and database administration.',
+                'description': 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
+                'image_url': 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
                 'credits': 3,
                 'category': 'SPECIALIZED',
                 'semester': 'fall_2024'
@@ -78,7 +79,8 @@ class Command(BaseCommand):
             {
                 'code': 'MATH101',
                 'name': 'Calculus I',
-                'description': 'Introduction to differential and integral calculus with applications.',
+                'description': 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+                'image_url': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
                 'credits': 4,
                 'category': 'CORE',
                 'semester': 'fall_2024'
@@ -86,7 +88,8 @@ class Command(BaseCommand):
             {
                 'code': 'MATH201',
                 'name': 'Linear Algebra',
-                'description': 'Vector spaces, matrices, linear transformations, and eigenvalues.',
+                'description': 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.',
+                'image_url': 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
                 'credits': 3,
                 'category': 'CORE',
                 'semester': 'spring_2025'
@@ -94,7 +97,8 @@ class Command(BaseCommand):
             {
                 'code': 'ENG101',
                 'name': 'Academic Writing',
-                'description': 'Development of academic writing skills and critical thinking.',
+                'description': 'Totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt.',
+                'image_url': 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
                 'credits': 3,
                 'category': 'CORE',
                 'semester': 'fall_2024'
@@ -102,7 +106,8 @@ class Command(BaseCommand):
             {
                 'code': 'PHYS101',
                 'name': 'Physics I',
-                'description': 'Mechanics, thermodynamics, and wave motion.',
+                'description': 'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.',
+                'image_url': 'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
                 'credits': 4,
                 'category': 'ELECTIVE',
                 'semester': 'spring_2025'
@@ -110,7 +115,8 @@ class Command(BaseCommand):
             {
                 'code': 'CS401',
                 'name': 'Machine Learning',
-                'description': 'Introduction to machine learning algorithms and applications.',
+                'description': 'Sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.',
+                'image_url': 'https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
                 'credits': 3,
                 'category': 'SPECIALIZED',
                 'semester': 'fall_2025'
@@ -220,22 +226,22 @@ class Command(BaseCommand):
         news_data = [
             {
                 'title': 'Welcome to Fall 2024 Semester',
-                'content': 'We are excited to welcome all students to the Fall 2024 semester. Registration is now open for all available modules. Please check the module catalog and register early to secure your preferred classes.',
+                'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.',
                 'is_published': True
             },
             {
                 'title': 'New Computer Science Modules Added',
-                'content': 'We have added several new specialized modules in Computer Science including Machine Learning, Artificial Intelligence, and Cybersecurity. These modules are now available for registration.',
+                'content': 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim.',
                 'is_published': True
             },
             {
                 'title': 'Campus Library Extended Hours',
-                'content': 'Starting this semester, the campus library will be open 24/7 during exam periods to support student learning and research activities.',
+                'content': 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis.',
                 'is_published': True
             },
             {
                 'title': 'Spring 2025 Registration Opens Soon',
-                'content': 'Registration for Spring 2025 semester will open on November 15, 2024. Students will receive email notifications with detailed registration instructions.',
+                'content': 'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.',
                 'is_published': False
             },
         ]

@@ -4,7 +4,7 @@ from .models import Registration
 @admin.register(Registration)
 class RegistrationAdmin(admin.ModelAdmin):
     list_display = ['student', 'module', 'status', 'registration_date', 'grade']
-    list_filter = ['status', 'registration_date', 'module__semester']
+    list_filter = ['status', 'registration_date', 'module__category']
     search_fields = ['student__user__username', 'student__user__email', 'module__code', 'module__name']
     ordering = ['-registration_date']
     list_editable = ['status', 'grade']

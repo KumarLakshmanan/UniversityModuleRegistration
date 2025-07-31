@@ -94,7 +94,7 @@
                     </div>
                     <div class="ml-4">
                         <h3 class="text-lg font-medium text-gray-900">Address</h3>
-                        <p class="text-gray-600">123 University Ave<br>Academic City, State 12345<br>United States</p>
+                        <p class="text-gray-600">{{ site_config.address|linebreaks|default:"123 University Ave<br>Academic City, State 12345<br>United States" }}</p>
                     </div>
                 </div>
 
@@ -108,7 +108,7 @@
                     </div>
                     <div class="ml-4">
                         <h3 class="text-lg font-medium text-gray-900">Phone</h3>
-                        <p class="text-gray-600">+1-555-123-4567</p>
+                        <p class="text-gray-600">{{ site_config.contact_phone|default:"+1-555-123-4567" }}</p>
                         <p class="text-sm text-gray-500">Monday - Friday, 9:00 AM - 5:00 PM</p>
                     </div>
                 </div>
@@ -123,7 +123,7 @@
                     </div>
                     <div class="ml-4">
                         <h3 class="text-lg font-medium text-gray-900">Email</h3>
-                        <p class="text-gray-600">info@university.edu</p>
+                        <p class="text-gray-600">{{ site_config.contact_email|default:"info@university.edu" }}</p>
                         <p class="text-sm text-gray-500">We'll respond within 24 hours</p>
                     </div>
                 </div>

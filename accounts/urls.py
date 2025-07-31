@@ -10,4 +10,5 @@ urlpatterns = [
     path('verify-otp/<int:user_id>/', views.verify_otp_view, name='verify_otp'),
     path('resend-otp/<int:user_id>/', views.resend_otp_view, name='resend_otp'),
     path('profile/', views.profile_view, name='profile'),
+    path('auth/login/', views.admin_login_blocked, name='admin_login_blocked'),
 ]

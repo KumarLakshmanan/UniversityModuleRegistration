@@ -59,29 +59,22 @@
                         <option value="pending">Pending</option>
                         <option value="dropped">Dropped</option>
                     </select>
-                    <select id="semesterFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="">All Semesters</option>
-                        <option value="2024-1">2024 Semester 1</option>
-                        <option value="2024-2">2024 Semester 2</option>
-                        <option value="2025-1">2025 Semester 1</option>
-                    </select>
                 </div>
             </div>
         </div>
 
         <!-- Registrations Grid -->
         <div id="registrationsContainer" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {% for registration in registrations %}
+            {% for registration in page_obj %}
             <div class="registration-card bg-white rounded-lg shadow-sm border overflow-hidden" 
                  data-status="{{ registration.status }}" 
-                 data-semester="{{ registration.module.semester }}"
-                 data-search="{{ registration.module.title|lower }} {{ registration.module.code|lower }} {{ registration.module.department.name|lower }}">
+                 data-search="{{ registration.module.name|lower }} {{ registration.module.code|lower }}">
                 
                 <!-- Module Header -->
                 <div class="p-6 pb-4">
                     <div class="flex items-start justify-between mb-3">
                         <div>
-                            <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ registration.module.title }}</h3>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ registration.module.name }}</h3>
                             <p class="text-sm text-gray-500">{{ registration.module.code }}</p>
                         </div>
                         <span class="status-badge status-{{ registration.status }}">
@@ -105,9 +98,6 @@
                         <div class="flex items-center">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                            </svg>
-                            {{ registration.module.semester }}
-                        </div>
                         <div class="flex items-center">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -174,25 +164,21 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const statusFilter = document.getElementById('statusFilter');
-    const semesterFilter = document.getElementById('semesterFilter');
     const registrationsContainer = document.getElementById('registrationsContainer');
     
     function filterRegistrations() {
         const searchTerm = searchInput.value.toLowerCase();
         const selectedStatus = statusFilter.value;
-        const selectedSemester = semesterFilter.value;
         const cards = registrationsContainer.querySelectorAll('.registration-card');
         
         cards.forEach(card => {
             const searchData = card.dataset.search;
             const status = card.dataset.status;
-            const semester = card.dataset.semester;
             
             const matchesSearch = !searchTerm || searchData.includes(searchTerm);
             const matchesStatus = !selectedStatus || status === selectedStatus;
-            const matchesSemester = !selectedSemester || semester === selectedSemester;
             
-            if (matchesSearch && matchesStatus && matchesSemester) {
+            if (matchesSearch && matchesStatus) {
                 card.style.display = 'block';
             } else {
                 card.style.display = 'none';
@@ -202,7 +188,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     searchInput.addEventListener('input', filterRegistrations);
     statusFilter.addEventListener('change', filterRegistrations);
-    semesterFilter.addEventListener('change', filterRegistrations);
 });
 
 let currentRegistrationId = null;

@@ -22,11 +22,6 @@ def module_list_view(request):
             Q(description__icontains=search_query)
         )
     
-    # Filter by semester
-    semester = request.GET.get('semester')
-    if semester:
-        modules = modules.filter(semester=semester)
-    
     # Filter by credits
     credits = request.GET.get('credits')
     if credits:
@@ -38,15 +33,12 @@ def module_list_view(request):
     page_obj = paginator.get_page(page_number)
     
     # Get filter options
-    semesters = Module.objects.filter(is_active=True).values_list('semester', flat=True).distinct()
     credit_options = Module.objects.filter(is_active=True).values_list('credits', flat=True).distinct()
     
     context = {
         'page_obj': page_obj,
         'search_query': search_query,
-        'semester': semester,
         'credits': credits,
-        'semesters': sorted(set(semesters)),
         'credit_options': sorted(set(credit_options)),
     }
     return render(request, 'modules/module_list.html', context)
@@ -106,24 +98,12 @@ def module_search_view(request):
             'code': module.code,
             'name': module.name,
             'credits': module.credits,
-            'semester': module.semester,
         })
     
     return JsonResponse({'results': results})
 
 
 def modules_by_semester_view(request, semester):
-    """View modules by semester"""
-    modules = Module.objects.filter(is_active=True, semester=semester)
-    
-    # Pagination
-    paginator = Paginator(modules, 12)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    context = {
-        'page_obj': page_obj,
-        'semester': semester,
-        'semester_display': semester.replace('_', ' ').title(),
-    }
-    return render(request, 'modules/modules_by_semester.html', context)
+    """Redirect to general module list since semesters are no longer used"""
+    from django.shortcuts import redirect
+    return redirect('modules:module_list')

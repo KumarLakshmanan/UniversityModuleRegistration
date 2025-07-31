@@ -31,8 +31,8 @@ class StudentsTestCase(TestCase):
         
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        self.assertEqual(data['username'], 'testuser')
-        self.assertEqual(data['student']['student_id'], 'STU001')
+        self.assertEqual(data['user']['username'], 'testuser')
+        self.assertEqual(data['student_id'], 'STU001')
 
     def test_profile_fetch_unauthenticated(self):
         """Test fetching profile for unauthenticated user"""
@@ -44,9 +44,11 @@ class StudentsTestCase(TestCase):
         self.client.force_login(self.user)
         
         update_data = {
-            'first_name': 'Updated',
-            'last_name': 'Name',
-            'email': 'updated@example.com',
+            'user': {
+                'first_name': 'Updated',
+                'last_name': 'Name',
+                'email': 'updated@example.com'
+            },
             'phone_number': '+1234567890',
             'address': '123 Test Street'
         }
@@ -55,6 +57,8 @@ class StudentsTestCase(TestCase):
                                    data=update_data, 
                                    content_type='application/json')
         
+        if response.status_code != 200:
+            raise AssertionError(f"Status: {response.status_code}, Content: {response.content}")
         self.assertEqual(response.status_code, 200)
         
         # Check updates were applied
@@ -98,10 +102,14 @@ class StudentsTestCase(TestCase):
             content_type="image/png"
         )
         
-        response = self.client.post('/api/profile/', {
-            'profile_picture': uploaded_file
-        })
+        # Use multipart for file upload
+        response = self.client.post(
+            '/api/profile/photo/',
+            {'profile_picture': uploaded_file}
+        )
         
+        if response.status_code != 200:
+            raise AssertionError(f"Status: {response.status_code}, Content: {response.content}")
         self.assertEqual(response.status_code, 200)
         
         # Check photo was uploaded
@@ -115,8 +123,8 @@ class StudentsTestCase(TestCase):
         
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        self.assertIn('profile', data)
-        self.assertIn('modules', data)
+        self.assertIn('student', data)
+        self.assertIn('registrations', data)
         self.assertIn('stats', data)
 
     def test_my_modules_fetch(self):
@@ -126,7 +134,9 @@ class StudentsTestCase(TestCase):
         
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        self.assertIsInstance(data, list)
+        self.assertIn('modules', data)
+        self.assertIn('count', data)
+        self.assertIsInstance(data['modules'], list)
 
 
 class StudentModelTestCase(TestCase):
