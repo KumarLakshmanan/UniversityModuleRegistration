@@ -108,37 +108,46 @@ class StudentRegistrationView(TemplateView):
 
     def send_verification_email(self, user):
         """Send email verification OTP"""
+        from django.template.loader import render_to_string
+        from django.core.mail import EmailMultiAlternatives
 
         # Generate and save OTP
         verification = EmailVerification.objects.create(user=user)
 
-        # Send email
+        # Render email template
         subject = 'Email Verification - University Module Registration'
-        message = f'''
-        Hello {user.first_name or user.username},
+        html_content = render_to_string('emails/verification_email.html', {
+            'user': user,
+            'otp': verification.otp,
+        })
         
-        Welcome to the University Module Registration System!
-        
-        Your email verification code is: {verification.otp}
-        
-        This code will expire in 10 minutes.
-        
-        Please enter this code on the verification page to activate your account.
-        
-        If you didn't create this account, please ignore this email.
-        
-        Best regards,
-        University Registration Team
+        text_content = f'''
+Hello {user.first_name or user.username},
+
+Welcome to the University Module Registration System!
+
+Your email verification code is: {verification.otp}
+
+This code will expire in 10 minutes.
+
+Please enter this code on the verification page to activate your account.
+
+If you didn't create this account, please ignore this email.
+
+Best regards,
+University Registration Team
         '''
 
         try:
-            send_mail(
+            # Create email with HTML and text versions
+            email = EmailMultiAlternatives(
                 subject,
-                message,
+                text_content,
                 settings.DEFAULT_FROM_EMAIL,
-                [user.email],
-                fail_silently=False,
+                [user.email]
             )
+            email.attach_alternative(html_content, "text/html")
+            email.send()
         except Exception as e:
             print(f"Failed to send email: {e}")
             raise Exception("Failed to send verification email")
@@ -163,6 +172,8 @@ class StudentLoginView(LoginView):
 
         # Check if user's email is verified
         if hasattr(user, 'student') and not user.student.is_email_verified:
+            # Store email in session for verification page
+            self.request.session['verification_email'] = user.email
             messages.warning(
                 self.request, 'Please verify your email address before logging in.')
             return redirect('students:verify_email')
@@ -185,25 +196,42 @@ class EmailVerificationView(TemplateView):
             if not email:
                 return JsonResponse({'success': False, 'message': 'Email is required.'})
             try:
+                from django.template.loader import render_to_string
+                from django.core.mail import EmailMultiAlternatives
+                
                 user = User.objects.get(email=email)
 
                 # Invalidate previous OTPs
                 EmailVerification.objects.filter(
                     user=user, is_used=False).update(is_used=True)
                 verification = EmailVerification.objects.create(user=user)
+                
                 subject = 'Email Verification - University Module Registration'
-                message = f"""
-                Hello {user.first_name or user.username},
+                html_content = render_to_string('emails/verification_email.html', {
+                    'user': user,
+                    'otp': verification.otp,
+                })
+                
+                text_content = f"""
+Hello {user.first_name or user.username},
 
-                Your new email verification code is: {verification.otp}
+Your new email verification code is: {verification.otp}
 
-                This code will expire in 10 minutes.
+This code will expire in 10 minutes.
 
-                Best regards,
-                University Registration Team
+Best regards,
+University Registration Team
                 """
-                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [
-                          user.email], fail_silently=False)
+                
+                email_msg = EmailMultiAlternatives(
+                    subject,
+                    text_content,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [user.email]
+                )
+                email_msg.attach_alternative(html_content, "text/html")
+                email_msg.send()
+                
                 return JsonResponse({'success': True, 'message': 'A new verification code has been sent to your email.'})
             except Exception as e:
                 return JsonResponse({'success': False, 'message': f'Failed to resend code: {str(e)}'})
@@ -245,6 +273,10 @@ class EmailVerificationView(TemplateView):
             user.student.is_email_verified = True
             user.student.save()
 
+            # Clear session email if exists
+            if 'verification_email' in request.session:
+                del request.session['verification_email']
+
             messages.success(
                 request, 'Email verified successfully! You can now log in.')
             return redirect('students:login')
@@ -259,8 +291,11 @@ class EmailVerificationView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Get email from query parameter if available
-        context['email'] = self.request.GET.get('email', '')
+        # Get email from query parameter, session, or empty
+        context['email'] = (
+            self.request.GET.get('email', '') or 
+            self.request.session.get('verification_email', '')
+        )
         return context
 
 
@@ -268,6 +303,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     """Student dashboard view"""
     template_name = 'students/dashboard.html'
     login_url = '/auth/login/'
+
+    def dispatch(self, request, *args, **kwargs):
+        # Check if user has student profile and email is verified
+        if hasattr(request.user, 'student') and not request.user.student.is_email_verified:
+            request.session['verification_email'] = request.user.email
+            messages.warning(request, 'Please verify your email address to access the dashboard.')
+            return redirect('students:verify_email')
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -288,11 +331,27 @@ class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'students/profile.html'
     login_url = '/auth/login/'
 
+    def dispatch(self, request, *args, **kwargs):
+        # Check if user has student profile and email is verified
+        if hasattr(request.user, 'student') and not request.user.student.is_email_verified:
+            request.session['verification_email'] = request.user.email
+            messages.warning(request, 'Please verify your email address to access your profile.')
+            return redirect('students:verify_email')
+        return super().dispatch(request, *args, **kwargs)
+
 
 class ProfileUpdateView(LoginRequiredMixin, TemplateView):
     """Student profile update view"""
     template_name = 'students/profile_edit.html'
     login_url = '/auth/login/'
+
+    def dispatch(self, request, *args, **kwargs):
+        # Check if user has student profile and email is verified
+        if hasattr(request.user, 'student') and not request.user.student.is_email_verified:
+            request.session['verification_email'] = request.user.email
+            messages.warning(request, 'Please verify your email address to edit your profile.')
+            return redirect('students:verify_email')
+        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         user = request.user
@@ -341,6 +400,14 @@ class MyModulesView(LoginRequiredMixin, TemplateView):
     template_name = 'students/my_modules.html'
     login_url = '/auth/login/'
 
+    def dispatch(self, request, *args, **kwargs):
+        # Check if user has student profile and email is verified
+        if hasattr(request.user, 'student') and not request.user.student.is_email_verified:
+            request.session['verification_email'] = request.user.email
+            messages.warning(request, 'Please verify your email address to view your modules.')
+            return redirect('students:verify_email')
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
@@ -381,30 +448,39 @@ class PasswordResetRequestView(TemplateView):
             # Generate and send OTP
             reset_otp = PasswordResetOTP.objects.create(user=user)
 
-            # Send email
+            # Send HTML email
+            from django.template.loader import render_to_string
+            from django.core.mail import EmailMultiAlternatives
+            
             subject = 'Password Reset - University Module Registration'
-            message = f'''
-            Hello {user.first_name or user.username},
+            html_content = render_to_string('emails/password_reset_email.html', {
+                'user': user,
+                'otp': reset_otp.otp,
+            })
             
-            You have requested to reset your password for the University Module Registration System.
-            
-            Your password reset code is: {reset_otp.otp}
-            
-            This code will expire in 10 minutes.
-            
-            If you didn't request this password reset, please ignore this email.
-            
-            Best regards,
-            University Registration Team
+            text_content = f'''
+Hello {user.first_name or user.username},
+
+You have requested to reset your password for the University Module Registration System.
+
+Your password reset code is: {reset_otp.otp}
+
+This code will expire in 10 minutes.
+
+If you didn't request this password reset, please ignore this email.
+
+Best regards,
+University Registration Team
             '''
 
-            send_mail(
+            email_msg = EmailMultiAlternatives(
                 subject,
-                message,
+                text_content,
                 settings.DEFAULT_FROM_EMAIL,
-                [user.email],
-                fail_silently=False,
+                [user.email]
             )
+            email_msg.attach_alternative(html_content, "text/html")
+            email_msg.send()
 
             messages.success(
                 request, 'Password reset code sent to your email.')

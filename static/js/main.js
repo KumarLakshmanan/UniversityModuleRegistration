@@ -21,6 +21,22 @@ $(document).ready(function() {
     setupSearch();
 });
 
+// Password visibility toggle function  
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const icon = document.getElementById(fieldId + '-icon');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        field.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
 // Count up animation for statistics
 function animateCountUp() {
     $('.count-up').each(function() {
@@ -278,4 +294,51 @@ function showLoading() {
 
 function hideLoading() {
     $('.loading-overlay').remove();
+}
+
+// Global functions for module registration (called from template buttons)
+function registerModule(moduleCode, url) {
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: {
+            'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+        },
+        success: function(response) {
+            if (response.success) {
+                showAlert('success', response.message);
+                location.reload(); // Reload to update button state
+            } else {
+                showAlert('error', response.message);
+            }
+        },
+        error: function() {
+            showAlert('error', 'An error occurred. Please try again.');
+        }
+    });
+}
+
+function unregisterModule(moduleCode, url) {
+    if (!confirm('Are you sure you want to unregister from this module?')) {
+        return;
+    }
+    
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: {
+            'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+        },
+        success: function(response) {
+            if (response.success) {
+                showAlert('success', response.message);
+                location.reload(); // Reload to update button state
+            } else {
+                showAlert('error', response.message);
+            }
+        },
+        error: function() {
+            showAlert('error', 'An error occurred. Please try again.');
+        }
+    });
 }

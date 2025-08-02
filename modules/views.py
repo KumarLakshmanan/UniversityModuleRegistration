@@ -69,6 +69,13 @@ class ModuleRegistrationView(LoginRequiredMixin, View):
     
     def post(self, request, code):
         try:
+            # Check if user's email is verified
+            if hasattr(request.user, 'student') and not request.user.student.is_email_verified:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Please verify your email address before registering for modules.'
+                })
+                
             module = get_object_or_404(Module, code=code, availability=True)
             student = request.user.student
             
@@ -112,6 +119,13 @@ class ModuleUnregistrationView(LoginRequiredMixin, View):
     
     def post(self, request, code):
         try:
+            # Check if user's email is verified
+            if hasattr(request.user, 'student') and not request.user.student.is_email_verified:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Please verify your email address before managing module registrations.'
+                })
+                
             module = get_object_or_404(Module, code=code)
             student = request.user.student
             

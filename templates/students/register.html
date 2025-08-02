@@ -40,11 +40,21 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="password1" class="form-label">Password *</label>
-                                <input type="password" class="form-control form-control-lg" id="password1" name="password1" required>
+                                <div class="input-group">
+                                    <input type="password" class="form-control form-control-lg" id="password1" name="password1" required>
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password1')">
+                                        <i class="fas fa-eye" id="password1-icon"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="password2" class="form-label">Confirm Password *</label>
-                                <input type="password" class="form-control form-control-lg" id="password2" name="password2" required>
+                                <div class="input-group">
+                                    <input type="password" class="form-control form-control-lg" id="password2" name="password2" required>
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password2')">
+                                        <i class="fas fa-eye" id="password2-icon"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div class="mb-3">
