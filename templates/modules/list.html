@@ -83,21 +83,18 @@
                         </div>
                         <div class="card-action">
                             <a href="{% url 'modules:detail' module.code %}" class="btn green">View Details</a>
-                            {% if user.is_authenticated and module.can_register %}
-                                <a href="#" class="btn green register-btn right" data-module-code="{{ module.code }}">
-                                    Register
-                                </a>
+                            {% if user.is_authenticated %}
+                                {% if module.is_registered %}
+                                    <a href="#" class="btn red unregister-btn right" data-module-code="{{ module.code }}">
+                                        Unregister
+                                    </a>
+                                {% elif module.can_register %}
+                                    <a href="#" class="btn green register-btn right" data-module-code="{{ module.code }}">
+                                        Register
+                                    </a>
+                                {% endif %}
                             {% endif %}
                         </div>
-                        
-                        <!-- Status Badge -->
-                        {% if module.is_available_for_registration and not module.is_full %}
-                            <span class="module-status status-active">Available</span>
-                        {% elif module.is_full %}
-                            <span class="module-status status-full">Full</span>
-                        {% else %}
-                            <span class="module-status status-inactive">Not Available</span>
-                        {% endif %}
                     </div>
                 </div>
             {% endfor %}
@@ -140,4 +137,7 @@
         </div>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
 {% endblock %}

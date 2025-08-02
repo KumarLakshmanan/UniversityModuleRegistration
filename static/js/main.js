@@ -193,31 +193,20 @@ function registerForModule(moduleCode, button) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
+        console.log(data);
+        if (data.status == "enrolled") {
             showMessage('Successfully registered for module!', 'success');
-            button.textContent = 'Registered';
-            button.classList.remove('blue');
-            button.classList.add('green');
-            
-            // Update button to unregister
-            button.classList.remove('register-btn');
-            button.classList.add('unregister-btn');
-            button.dataset.moduleCode = moduleCode;
-            button.onclick = function(e) {
-                e.preventDefault();
-                unregisterFromModule(moduleCode, this);
-            };
+            setTimeout(() => {
+                // Optionally, redirect to the module details page or refresh the page
+                window.location.reload();
+            }, 100);
         } else {
+            console.log(data['success']);
             showMessage(data.message || 'Error registering for module.', 'error');
             button.disabled = false;
             button.textContent = originalText;
         }
     })
-    .catch(error => {
-        showMessage('Error registering for module.', 'error');
-        button.disabled = false;
-        button.textContent = originalText;
-    });
 }
 
 function unregisterFromModule(moduleCode, button) {
@@ -238,19 +227,12 @@ function unregisterFromModule(moduleCode, button) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
+        if (data.status == "unregistered") {
             showMessage('Successfully unregistered from module!', 'success');
-            
-            // Remove the module card or update button
-            const moduleCard = button.closest('.module-card, .card');
-            if (moduleCard) {
-                moduleCard.remove();
-            } else {
-                button.textContent = 'Register';
-                button.classList.remove('red', 'unregister-btn');
-                button.classList.add('blue', 'register-btn');
-                button.disabled = false;
-            }
+            setTimeout(() => {
+                // Optionally, redirect to the module details page or refresh the page
+                window.location.reload();
+            }, 100);
         } else {
             showMessage(data.message || 'Error unregistering from module.', 'error');
             button.disabled = false;

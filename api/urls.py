@@ -32,6 +32,11 @@ urlpatterns = [
     path('modules/<int:module_id>/register/', views.ModuleRegistrationAPIView.as_view(), name='module_register'),
     path('modules/<int:module_id>/unregister/', views.ModuleRegistrationAPIView.as_view(), name='module_unregister'),
     
+    # Register for a module by code
+    path('modules/<str:code>/register/', views.ModuleRegisterByCodeAPIView.as_view(), name='module_register'),
+    # Unregister from a module by code
+    path('modules/<str:code>/unregister/', views.ModuleUnregisterByCodeAPIView.as_view(), name='module_unregister'),
+
     # Other endpoints
     path('contact/', views.ContactAPIView.as_view(), name='contact'),
     path('stats/', views.SystemStatsAPIView.as_view(), name='stats'),

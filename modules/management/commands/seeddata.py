@@ -11,7 +11,17 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS('Starting data seeding...'))
-        
+        # Create admin user if not exists
+        if not User.objects.filter(username='admin').exists():
+            User.objects.create_superuser('admin', 'admin@example.com', 'Admin!2025')
+            self.stdout.write('Admin user created')
+        else:
+            # Set admin password
+            admin = User.objects.get(username='admin')
+            admin.set_password('Admin!2025')
+            admin.save()
+            self.stdout.write('Admin password set')
+
         # Create sample modules
         self.create_sample_modules()
         

@@ -1,40 +1,76 @@
-
 ## 📁 Project Structure
 
 ```
-module_registration_1/
-├── module_registration/          # Main project directory
-│   ├── settings.py              # Django settings
-│   ├── urls.py                  # Main URL configuration
-│   └── wsgi.py                  # WSGI configuration
-├── core/                        # Core app (home, about, contact)
-│   ├── management/commands/     # Custom management commands
-│   ├── views.py                # Core views
-│   └── urls.py                 # Core URLs
+module_registration_3/
+├── course_registration/         # Main project directory (settings, URLs, WSGI)
+│   ├── asgi.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── accounts/                    # User accounts app (registration, login, email verification)
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── urls.py
+│   ├── views.py
+│   └── migrations/
 ├── students/                    # Student management app
-│   ├── models.py               # Student, EmailVerification, PasswordResetOTP
-│   ├── views.py                # Authentication and profile views
-│   ├── admin.py                # Custom admin configuration
-│   └── urls.py                 # Student URLs
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── urls.py
+│   ├── views.py
+│   └── migrations/
 ├── modules/                     # Module management app
-│   ├── models.py               # Module and Registration models
-│   ├── views.py                # Module listing and registration views
-│   ├── admin.py                # Module admin configuration
-│   └── urls.py                 # Module URLs
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── urls.py
+│   ├── views.py
+│   ├── management/
+│   └── migrations/
+├── registrations/               # Module registration app
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── urls.py
+│   ├── views.py
+│   └── migrations/
 ├── api/                         # REST API app
-│   ├── views.py                # API viewsets and serializers
-│   └── urls.py                 # API URLs
-├── templates/                   # Template files
-│   ├── base/                   # Base templates
-│   ├── core/                   # Core app templates
-│   ├── modules/                # Module app templates
-│   └── students/               # Student app templates
-├── static/                      # Static files
-│   ├── css/                    # Custom CSS
-│   └── js/                     # Custom JavaScript
-├── media/                       # Media files (uploads)
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── serializers.py
+│   ├── urls.py
+│   ├── views.py
+│   └── migrations/
+├── sitecore/                    # Core site app (home, about, contact)
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── urls.py
+│   ├── views.py
+│   ├── management/
+│   └── migrations/
+├── templates/                   # HTML templates
+│   ├── base.html
+│   ├── accounts/
+│   ├── api/
+│   ├── modules/
+│   ├── registrations/
+│   ├── sitecore/
+│   └── students/
+├── static/                      # Static files (CSS, JS)
+│   ├── css/
+│   └── js/
+├── media/                       # Uploaded media files
+│   └── student_photos/
+├── manage.py                    # Django management script
 ├── requirements.txt             # Python dependencies
-└── manage.py                   # Django management script
+├── .gitignore
+├── README.md
+├── SETUP.md
+└── module_registration_v3.sql   # Database schema
 ```
 
 ## 🚀 Running the Application
@@ -46,7 +82,7 @@ module_registration_1/
 ### Setup Commands
 ```bash
 # Navigate to project directory
-cd d:\django\module_registration_1
+cd d:\django\module_registration_3
 
 # Create virtual environment
 python3.11 -m venv venv
@@ -64,7 +100,7 @@ python3.11 manage.py migrate
 python3.11 manage.py createsuperuser
 
 # Populate sample data
-python3.11 manage.py populate_sample_data
+python3.11 manage.py seeddata
 
 # Start development server
 python3.11 manage.py runserver
@@ -79,23 +115,21 @@ python3.11 manage.py runserver
 ## 📊 Sample Data
 
 ### Sample Students (Login Credentials)
-- **Username**: `john_doe` | **Password**: `password123`
-- **Username**: `jane_smith` | **Password**: `password123`
-- **Username**: `bob_wilson` | **Password**: `password123`
-- **Username**: `alice_brown` | **Password**: `password123`
-- **Username**: `charlie_davis` | **Password**: `password123`
+- **Username**: `john_doe` | **Email**: `john.doe@student.edu` | **Password**: `student123`
+- **Username**: `jane_smith` | **Email**: `jane.smith@student.edu` | **Password**: `student123`
+- **Username**: `mike_johnson` | **Email**: `mike.johnson@student.edu` | **Password**: `student123`
 
 ### Sample Modules
 - CS101 - Introduction to Computer Science (3 credits)
-- CS201 - Database Management Systems (4 credits)
-- CS301 - Web Development (3 credits)
-- DA101 - Data Analytics (3 credits)
-- ML201 - Machine Learning (4 credits)
-- SE301 - Software Engineering (3 credits)
-- MAD201 - Mobile App Development (3 credits)
-- CYB101 - Cybersecurity Fundamentals (3 credits)
-- MKT201 - Digital Marketing (2 credits)
-- PM101 - Project Management (2 credits)
+- WEB201 - Web Development Fundamentals (4 credits)
+- DB301 - Database Systems (3 credits)
+- ML401 - Machine Learning Basics (4 credits)
+- MOB301 - Mobile App Development (4 credits)
+- SE401 - Software Engineering Principles (3 credits)
+- SEC301 - Cybersecurity Fundamentals (3 credits)
+- DSA201 - Data Structures and Algorithms (4 credits)
+- DMA201 - Digital Marketing Analytics (2 credits)
+- PM301 - Project Management (2 credits)
 
 
 ## Database Configuration

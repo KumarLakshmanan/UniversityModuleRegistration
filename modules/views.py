@@ -47,6 +47,29 @@ class ModuleListView(ListView):
         context['selected_category'] = self.request.GET.get('category', '')
         context['available_only'] = self.request.GET.get('available', '')
         context['category_choices'] = Module.CATEGORY_CHOICES
+
+        # Annotate each module with is_registered and can_register for the current user
+        user = self.request.user
+        modules = context['modules']
+        if user.is_authenticated:
+            try:
+                student = user.student_profile
+                registered_ids = set(
+                    Registration.objects.filter(student=student, is_active=True)
+                    .values_list('module_id', flat=True)
+                )
+                for module in modules:
+                    module.is_registered = module.id in registered_ids
+                    # Only allow register if not already registered and can_register is True
+                    module.can_register = (not module.is_registered) and getattr(module, 'can_register', lambda: True)()
+            except Exception:
+                for module in modules:
+                    module.is_registered = False
+                    module.can_register = getattr(module, 'can_register', lambda: True)()
+        else:
+            for module in modules:
+                module.is_registered = False
+                module.can_register = getattr(module, 'can_register', lambda: True)()
         return context
 
 

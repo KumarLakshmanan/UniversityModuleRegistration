@@ -124,25 +124,13 @@
                     </span>
                     
                     <div class="row">
-                        <div class="col s6 m3">
+                        <div class="col m6">
                             <div class="center">
                                 <h4 class="green-text">{{ student.registrations.count }}</h4>
                                 <p>Total Registrations</p>
                             </div>
                         </div>
-                        <div class="col s6 m3">
-                            <div class="center">
-                                <h4 class="green-text">{{ student.registrations.filter.is_active.count }}</h4>
-                                <p>Active Modules</p>
-                            </div>
-                        </div>
-                        <div class="col s6 m3">
-                            <div class="center">
-                                <h4 class="orange-text">{{ completed_count }}</h4>
-                                <p>Completed</p>
-                            </div>
-                        </div>
-                        <div class="col s6 m3">
+                        <div class="col m6">
                             <div class="center">
                                 <h4 class="purple-text">{% if student.is_profile_complete %}100{% else %}60{% endif %}%</h4>
                                 <p>Profile Complete</p>

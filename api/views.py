@@ -324,7 +324,7 @@ class ModuleRegistrationAPIView(APIView):
             )
             
             serializer = RegistrationSerializer(registration)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_200_OK)
             
         except Student.DoesNotExist:
             return Response(
@@ -375,3 +375,90 @@ class ModuleRegistrationAPIView(APIView):
                 {'error': str(e)}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+class ModuleRegisterByCodeAPIView(APIView):
+    """
+    API endpoint for student registration by module code.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, code):
+        try:
+            module = get_object_or_404(Module, code=code, status='active')
+            student = request.user.student_profile
+
+            # Check if can register
+            if hasattr(module, 'can_register') and callable(module.can_register):
+                can_register = module.can_register()
+            else:
+                can_register = True
+            if not can_register:
+                return Response({'error': 'Cannot register for this module'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Check for existing registration (active or inactive)
+            reg = Registration.objects.filter(student=student, module=module).first()
+            if reg:
+                if reg.is_active:
+                    return Response({'error': 'Already registered for this module'}, status=status.HTTP_400_BAD_REQUEST)
+                # Reactivate withdrawn registration
+                reg.is_active = True
+                reg.status = 'enrolled'
+                reg.withdrawal_date = None
+                reg.withdrawal_reason = ''
+                reg.completion_date = None
+                reg.grade = ''
+                reg.save()
+                serializer = RegistrationSerializer(reg)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+            # Create registration if none exists
+            registration = Registration.objects.create(
+                student=student,
+                module=module,
+                status='enrolled',
+                is_active=True
+            )
+            serializer = RegistrationSerializer(registration)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Student.DoesNotExist:
+            return Response({'error': 'Student profile not found'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ModuleUnregisterByCodeAPIView(APIView):
+    """
+    API endpoint for student unregistration by module code.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, code):
+        return self._unregister(request, code)
+
+    def post(self, request, code):
+        return self._unregister(request, code)
+
+    def _unregister(self, request, code):
+        try:
+            module = get_object_or_404(Module, code=code)
+            student = request.user.student_profile
+            registration = get_object_or_404(
+                Registration,
+                student=student,
+                module=module,
+                is_active=True
+            )
+            # Mark as withdrawn instead of deleting
+            registration.status = 'withdrawn'
+            registration.is_active = False
+            registration.save()
+            return Response({
+                'status': 'unregistered',
+                'message': 'Successfully unregistered from module'}, status=status.HTTP_200_OK)
+        except Student.DoesNotExist:
+            return Response({'error': 'Student profile not found'}, status=status.HTTP_400_BAD_REQUEST)
+        except Registration.DoesNotExist:
+            return Response({'error': 'Registration not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
