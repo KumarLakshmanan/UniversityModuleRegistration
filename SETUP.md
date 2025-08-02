@@ -96,3 +96,14 @@ python3.11 manage.py runserver
 - CYB101 - Cybersecurity Fundamentals (3 credits)
 - MKT201 - Digital Marketing (2 credits)
 - PM101 - Project Management (2 credits)
+
+
+## Database Configuration
+For local development, use the following MySQL configuration:
+```ini
+[mysql]
+user = root
+password = 
+database = module_registration_v1
+host = localhost
+```

@@ -6,7 +6,6 @@ from modules.models import Module, Registration
 
 
 class StudentViewsTestCase(TestCase):
-    """Test cases for student views"""
 
     def setUp(self):
         self.client = Client()
@@ -24,19 +23,16 @@ class StudentViewsTestCase(TestCase):
         )
 
     def test_login_page_loads(self):
-        """Test login page loads successfully"""
         response = self.client.get(reverse('students:login'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Student Login')
 
     def test_register_page_loads(self):
-        """Test register page loads successfully"""
         response = self.client.get(reverse('students:register'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Student Registration')
 
     def test_login_functionality(self):
-        """Test login functionality"""
         response = self.client.post(reverse('students:login'), {
             'username': 'testuser',
             'password': 'testpass123'
@@ -45,33 +41,28 @@ class StudentViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_dashboard_requires_login(self):
-        """Test dashboard requires login"""
         response = self.client.get(reverse('students:dashboard'))
         self.assertEqual(response.status_code, 302)  # Redirect to login
 
     def test_dashboard_authenticated(self):
-        """Test dashboard loads for authenticated user"""
         self.client.login(username='testuser', password='testpass123')
         response = self.client.get(reverse('students:dashboard'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Dashboard')
 
     def test_profile_authenticated(self):
-        """Test profile loads for authenticated user"""
         self.client.login(username='testuser', password='testpass123')
         response = self.client.get(reverse('students:profile'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'My Profile')
 
     def test_profile_edit_get(self):
-        """Test profile edit page loads"""
         self.client.login(username='testuser', password='testpass123')
         response = self.client.get(reverse('students:profile_edit'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Edit Profile')
 
     def test_profile_edit_post(self):
-        """Test profile edit form submission"""
         self.client.login(username='testuser', password='testpass123')
         response = self.client.post(reverse('students:profile_edit'), {
             'first_name': 'Updated',
@@ -90,14 +81,12 @@ class StudentViewsTestCase(TestCase):
         self.assertEqual(self.user.first_name, 'Updated')
 
     def test_logout_redirect(self):
-        """Test logout redirects properly"""
         self.client.login(username='testuser', password='testpass123')
         response = self.client.post(
             reverse('students:logout'))  # POST instead of GET
         self.assertEqual(response.status_code, 302)  # Redirect after logout
 
     def test_student_registration_form(self):
-        """Test student registration form submission"""
         response = self.client.post(reverse('students:register'), {
             'username': 'newuser',
             'email': 'newuser@example.com',
@@ -114,7 +103,6 @@ class StudentViewsTestCase(TestCase):
         self.assertIn(response.status_code, [200, 302])
 
     def test_student_model_creation(self):
-        """Test student model creation"""
         new_user = User.objects.create_user(
             username='newuser2',
             email='newuser2@example.com',
