@@ -60,11 +60,21 @@
                 </div>
 
                 <!-- Prerequisites -->
-                {% if module.prerequisites %}
+                {% if module.prerequisites.exists %}
                 <div class="bg-white rounded-lg shadow-sm border p-6">
                     <h2 class="text-2xl font-bold text-gray-900 mb-4">Prerequisites</h2>
-                    <div class="text-gray-600">
-                        {{ module.prerequisites|linebreaks }}
+                    <div class="space-y-2">
+                        {% for prereq in module.prerequisites.all %}
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <div class="flex-grow">
+                                    <h3 class="font-medium text-gray-900">{{ prereq.code }}</h3>
+                                    <p class="text-sm text-gray-600">{{ prereq.name }}</p>
+                                </div>
+                                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                                    {{ prereq.credits }} credits
+                                </span>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
                 {% endif %}
@@ -118,7 +128,7 @@
                 <div class="info-card bg-white rounded-lg shadow-sm border p-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Registration</h3>
                     
-                    {% if user.is_authenticated and user.student %}
+                    {% if user.is_authenticated and student %}
                         {% if is_registered %}
                             <div class="text-center">
                                 <div class="registration-status bg-green-100 text-green-800 px-4 py-3 rounded-lg mb-4">
@@ -171,7 +181,7 @@
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600">Enrolled Students:</span>
-                            <span class="font-medium">{{ registration_count }}</span>
+                            <span class="font-medium">{{ stats.enrolled_students }}</span>
                         </div>
                         {% if module.max_students %}
                         <div class="flex justify-between">
@@ -210,15 +220,27 @@
 
 {% block extra_js %}
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Ensure functions are available globally
+    window.registerModule = registerModule;
+    window.unregisterModule = unregisterModule;
+});
+
 function registerModule() {
     if (!confirm('Are you sure you want to register for this module?')) {
+        return;
+    }
+    
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (!csrfToken) {
+        alert('CSRF token not found. Please refresh the page.');
         return;
     }
     
     fetch('/api/registrations/', {
         method: 'POST',
         headers: {
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'X-CSRFToken': csrfToken.value,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -247,10 +269,16 @@ function unregisterModule() {
     }
     
     {% if is_registered %}
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (!csrfToken) {
+        alert('CSRF token not found. Please refresh the page.');
+        return;
+    }
+    
     fetch(`/api/registrations/{{ registration.pk }}/`, {
         method: 'DELETE',
         headers: {
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'X-CSRFToken': csrfToken.value,
             'Content-Type': 'application/json',
         },
     })

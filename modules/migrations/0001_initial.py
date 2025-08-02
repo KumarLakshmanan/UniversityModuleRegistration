@@ -20,7 +20,6 @@ class Migration(migrations.Migration):
                 ('description', models.TextField()),
                 ('credits', models.PositiveIntegerField(default=3)),
                 ('category', models.CharField(choices=[('CORE', 'Core'), ('ELECTIVE', 'Elective'), ('OPTIONAL', 'Optional'), ('SPECIALIZED', 'Specialized')], default='CORE', max_length=20)),
-                ('semester', models.CharField(choices=[('fall_2024', 'Fall 2024'), ('spring_2025', 'Spring 2025'), ('summer_2025', 'Summer 2025'), ('fall_2025', 'Fall 2025')], default='fall_2024', max_length=20)),
                 ('is_active', models.BooleanField(default=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),

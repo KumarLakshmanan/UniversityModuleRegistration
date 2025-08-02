@@ -155,20 +155,9 @@ def registration_stats_view(request):
         'completed_credits': sum(reg.module.credits for reg in registrations.filter(status='completed')),
     }
     
-    # Get registrations by semester
-    semester_stats = {}
-    for reg in registrations.select_related('module'):
-        semester = reg.module.semester
-        if semester not in semester_stats:
-            semester_stats[semester] = {'count': 0, 'credits': 0}
-        semester_stats[semester]['count'] += 1
-        if reg.status in ['enrolled', 'completed']:
-            semester_stats[semester]['credits'] += reg.module.credits
-    
     context = {
         'student': student,
         'stats': stats,
-        'semester_stats': semester_stats,
     }
     return render(request, 'registrations/registration_stats.html', context)
 

@@ -91,7 +91,7 @@ class SiteConfigurationSerializer(serializers.ModelSerializer):
     class Meta:
         model = SiteConfiguration
         fields = ['id', 'site_name', 'site_description', 'contact_email', 
-                 'contact_phone', 'current_semester', 'academic_year', 
+                 'contact_phone', 'academic_year', 
                  'is_registration_open', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 

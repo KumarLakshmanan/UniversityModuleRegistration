@@ -31,8 +31,6 @@ def dashboard_view(request):
     
     # Calculate stats
     total_credits = sum(reg.module.credits for reg in registrations.filter(status__in=['enrolled', 'completed']))
-    pending_registrations = registrations.filter(status='pending').count()
-    completed_modules = registrations.filter(status='completed').count()
     
     context = {
         'student': student,
@@ -41,8 +39,6 @@ def dashboard_view(request):
         'site_config': site_config,
         'stats': {
             'total_credits': total_credits,
-            'pending_registrations': pending_registrations,
-            'completed_modules': completed_modules,
             'total_registrations': registrations.count(),
         }
     }
@@ -132,11 +128,6 @@ def modules_view(request):
     # Get all active modules
     modules = Module.objects.filter(is_active=True)
     
-    # Filter by semester if specified
-    semester = request.GET.get('semester')
-    if semester:
-        modules = modules.filter(semester=semester)
-    
     # Get student's current registrations
     student_registrations = Registration.objects.filter(student=student).values_list('module_id', flat=True)
     
@@ -144,14 +135,9 @@ def modules_view(request):
     for module in modules:
         module.is_registered = module.id in student_registrations
     
-    # Get unique semesters for filter
-    semesters = Module.objects.filter(is_active=True).values_list('semester', flat=True).distinct()
-    
     context = {
         'student': student,
         'modules': modules,
-        'semesters': sorted(set(semesters)),
-        'current_semester': semester
     }
     return render(request, 'students/modules.html', context)
 

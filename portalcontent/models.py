@@ -9,6 +9,7 @@ class SiteConfiguration(models.Model):
     address = models.TextField(default="123 University Ave, City, State 12345")
     about_content = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
+    is_registration_open = models.BooleanField(default=True, help_text="Is module registration currently open?")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

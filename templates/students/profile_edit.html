@@ -6,7 +6,7 @@
 {% block extra_css %}
 <style>
     .profile-form-container {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
         min-height: 100vh;
     }
     .form-card {
@@ -32,8 +32,8 @@
     }
     .form-input:focus {
         outline: none;
-        border-color: #6366f1;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        border-color: #dc2626;
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
     }
     .form-textarea {
         resize: vertical;
@@ -56,8 +56,8 @@
         cursor: pointer;
     }
     .photo-upload-area:hover {
-        border-color: #6366f1;
-        background-color: #f8fafc;
+        border-color: #dc2626;
+        background-color: #fef2f2;
     }
     .error-message {
         color: #dc2626;
@@ -231,7 +231,7 @@
                     <!-- Action Buttons -->
                     <div class="flex flex-col sm:flex-row gap-4">
                         <button type="submit" 
-                                class="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                class="flex-1 bg-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
                             Update Profile
                         </button>
                         <a href="{% url 'students:dashboard' %}" 

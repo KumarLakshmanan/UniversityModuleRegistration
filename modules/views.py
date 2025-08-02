@@ -102,8 +102,3 @@ def module_search_view(request):
     
     return JsonResponse({'results': results})
 
-
-def modules_by_semester_view(request, semester):
-    """Redirect to general module list since semesters are no longer used"""
-    from django.shortcuts import redirect
-    return redirect('modules:module_list')

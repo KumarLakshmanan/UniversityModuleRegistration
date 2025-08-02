@@ -29,7 +29,7 @@ urlpatterns = [
     path('', include('accounts.urls')),
     
     # Student URLs
-    path('', include('students.urls')),
+    path('students/', include('students.urls')),
     
     # Module URLs
     path('modules/', include('modules.urls')),

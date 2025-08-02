@@ -74,7 +74,6 @@ class Command(BaseCommand):
                 'image_url': 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
                 'credits': 3,
                 'category': 'SPECIALIZED',
-                'semester': 'fall_2024'
             },
             {
                 'code': 'MATH101',
@@ -83,7 +82,6 @@ class Command(BaseCommand):
                 'image_url': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
                 'credits': 4,
                 'category': 'CORE',
-                'semester': 'fall_2024'
             },
             {
                 'code': 'MATH201',
@@ -92,7 +90,6 @@ class Command(BaseCommand):
                 'image_url': 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
                 'credits': 3,
                 'category': 'CORE',
-                'semester': 'spring_2025'
             },
             {
                 'code': 'ENG101',
@@ -101,7 +98,6 @@ class Command(BaseCommand):
                 'image_url': 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
                 'credits': 3,
                 'category': 'CORE',
-                'semester': 'fall_2024'
             },
             {
                 'code': 'PHYS101',
@@ -110,7 +106,6 @@ class Command(BaseCommand):
                 'image_url': 'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
                 'credits': 4,
                 'category': 'ELECTIVE',
-                'semester': 'spring_2025'
             },
             {
                 'code': 'CS401',
@@ -119,7 +114,6 @@ class Command(BaseCommand):
                 'image_url': 'https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
                 'credits': 3,
                 'category': 'SPECIALIZED',
-                'semester': 'fall_2025'
             },
         ]
         
