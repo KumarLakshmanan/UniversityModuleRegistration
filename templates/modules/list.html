@@ -6,8 +6,8 @@
 <div class="container section">
     <div class="row">
         <div class="col s12">
-            <h2 class="center blue-text">Module Catalog</h2>
-            <p class="center flow-text">Explore our comprehensive range of academic modules</p>
+            <h2 class="center green-text">Module Catalog</h2>
+            <p class="center flow-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
         </div>
     </div>
     
@@ -39,7 +39,7 @@
                                     <span>Available only</span>
                                 </label>
                                 <br><br>
-                                <button class="btn blue waves-effect waves-light" type="submit">
+                                <button class="btn green waves-effect waves-light" type="submit">
                                     <i class="material-icons left">search</i>Search
                                 </button>
                             </div>
@@ -56,6 +56,15 @@
             {% for module in modules %}
                 <div class="col s12 m6 l4">
                     <div class="card module-card hoverable">
+                        {% if module.image_url %}
+                            <div class="card-image">
+                                <img src="{{ module.image_url }}" alt="{{ module.name }}">
+                            </div>
+                        {% else %}
+                            <div class="card-image">
+                                <img src="https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=300&fit=crop" alt="{{ module.name }}">
+                            </div>
+                        {% endif %}
                         <div class="card-content">
                             <span class="card-title">{{ module.name }}</span>
                             <p><strong>Code:</strong> {{ module.code }}</p>
@@ -73,7 +82,7 @@
                             </div>
                         </div>
                         <div class="card-action">
-                            <a href="{% url 'modules:detail' module.code %}" class="btn blue">View Details</a>
+                            <a href="{% url 'modules:detail' module.code %}" class="btn green">View Details</a>
                             {% if user.is_authenticated and module.can_register %}
                                 <a href="#" class="btn green register-btn right" data-module-code="{{ module.code }}">
                                     Register
@@ -99,7 +108,7 @@
                         <i class="material-icons large grey-text">search_off</i>
                         <h5>No modules found</h5>
                         <p>Try adjusting your search criteria or browse all available modules.</p>
-                        <a href="{% url 'modules:list' %}" class="btn blue">View All Modules</a>
+                        <a href="{% url 'modules:list' %}" class="btn green">View All Modules</a>
                     </div>
                 </div>
             </div>

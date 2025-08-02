@@ -25,8 +25,10 @@ class LoginView(TemplateView):
         if user is not None:
             # Check if user is verified
             if hasattr(user, 'student_profile') and not user.student_profile.is_verified:
-                messages.error(request, 'Please verify your email before logging in.')
-                return render(request, self.template_name)
+                messages.info(request, 'Please verify your email to complete your account setup.')
+                # Store user ID in session for verification
+                request.session['unverified_user_id'] = user.id
+                return redirect('accounts:verify_email')
             
             login(request, user)
             next_url = request.GET.get('next', '/dashboard/')
@@ -88,6 +90,9 @@ class RegisterView(TemplateView):
     
     def send_verification_otp(self, user):
         """Generate and send verification OTP."""
+        from django.core.mail import send_mail
+        from django.template.loader import render_to_string
+        
         otp_code = ''.join(random.choices(string.digits, k=6))
         expires_at = timezone.now() + timedelta(minutes=settings.OTP_EXPIRY_MINUTES)
         
@@ -98,9 +103,29 @@ class RegisterView(TemplateView):
             expires_at=expires_at
         )
         
-        # TODO: Send email with OTP
-        # For now, we'll just print it (in production, send actual email)
-        print(f"Verification OTP for {user.email}: {otp_code}")
+        # Send email
+        try:
+            subject = 'Email Verification - Course Registration System'
+            html_message = render_to_string('accounts/emails/otp_email.html', {
+                'user': user,
+                'otp_code': otp_code,
+                'expiry_minutes': settings.OTP_EXPIRY_MINUTES
+            })
+            plain_message = f"Your verification code is: {otp_code}. This code expires in {settings.OTP_EXPIRY_MINUTES} minutes."
+            
+            send_mail(
+                subject=subject,
+                message=plain_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+            print(f"Verification OTP for {user.email}: {otp_code}")
+        except Exception as e:
+            print(f"Failed to send verification email: {e}")
+            # Still print OTP for development
+            print(f"Verification OTP for {user.email}: {otp_code}")
 
 
 class LogoutView(View):
@@ -177,8 +202,31 @@ class ResendVerificationView(View):
                 expires_at=expires_at
             )
             
-            # TODO: Send email with OTP
-            print(f"New verification OTP for {user.email}: {otp_code}")
+            # Send email
+            try:
+                from django.core.mail import send_mail
+                from django.template.loader import render_to_string
+                
+                subject = 'Email Verification - Course Registration System'
+                html_message = render_to_string('accounts/emails/otp_email.html', {
+                    'user': user,
+                    'otp_code': otp_code,
+                    'expiry_minutes': settings.OTP_EXPIRY_MINUTES
+                })
+                plain_message = f"Your verification code is: {otp_code}. This code expires in {settings.OTP_EXPIRY_MINUTES} minutes."
+                
+                send_mail(
+                    subject=subject,
+                    message=plain_message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[user.email],
+                    html_message=html_message,
+                    fail_silently=False,
+                )
+                print(f"New verification OTP for {user.email}: {otp_code}")
+            except Exception as e:
+                print(f"Failed to send verification email: {e}")
+                print(f"New verification OTP for {user.email}: {otp_code}")
             
             messages.success(request, 'New verification code sent to your email.')
             return redirect('accounts:verify_email')
@@ -211,8 +259,31 @@ class PasswordResetRequestView(TemplateView):
                 expires_at=expires_at
             )
             
-            # TODO: Send email with OTP
-            print(f"Password reset OTP for {user.email}: {otp_code}")
+            # Send email
+            try:
+                from django.core.mail import send_mail
+                from django.template.loader import render_to_string
+                
+                subject = 'Password Reset - Course Registration System'
+                html_message = render_to_string('accounts/emails/password_reset_email.html', {
+                    'user': user,
+                    'otp_code': otp_code,
+                    'expiry_minutes': settings.OTP_EXPIRY_MINUTES
+                })
+                plain_message = f"Your password reset code is: {otp_code}. This code expires in {settings.OTP_EXPIRY_MINUTES} minutes."
+                
+                send_mail(
+                    subject=subject,
+                    message=plain_message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[user.email],
+                    html_message=html_message,
+                    fail_silently=False,
+                )
+                print(f"Password reset OTP for {user.email}: {otp_code}")
+            except Exception as e:
+                print(f"Failed to send password reset email: {e}")
+                print(f"Password reset OTP for {user.email}: {otp_code}")
             
             messages.success(request, 'Password reset code sent to your email.')
             return redirect('accounts:password_reset_confirm')

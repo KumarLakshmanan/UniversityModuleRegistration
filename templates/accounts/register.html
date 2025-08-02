@@ -8,7 +8,7 @@
         <div class="col s12 m8 offset-m2">
             <div class="card">
                 <div class="card-content">
-                    <span class="card-title center blue-text">Create Student Account</span>
+                    <span class="card-title center green-text">Create Student Account</span>
                     
                     <form method="post">
                         {% csrf_token %}
@@ -40,10 +40,12 @@
                             <div class="input-field col s12 m6">
                                 <input id="password" name="password" type="password" class="validate" required>
                                 <label for="password">Password *</label>
+                                <i class="material-icons suffix password-toggle" style="cursor: pointer;" onclick="togglePassword('password')">visibility_off</i>
                             </div>
                             <div class="input-field col s12 m6">
                                 <input id="password_confirm" name="password_confirm" type="password" class="validate" required>
                                 <label for="password_confirm">Confirm Password *</label>
+                                <i class="material-icons suffix password-toggle" style="cursor: pointer;" onclick="togglePassword('password_confirm')">visibility_off</i>
                             </div>
                         </div>
                         
@@ -51,14 +53,14 @@
                             <div class="col s12">
                                 <label>
                                     <input type="checkbox" class="filled-in" required />
-                                    <span>I agree to the <a href="#" class="blue-text">Terms of Service</a> and <a href="#" class="blue-text">Privacy Policy</a></span>
+                                    <span>I agree to the <a href="#" class="green-text">Terms of Service</a> and <a href="#" class="green-text">Privacy Policy</a></span>
                                 </label>
                             </div>
                         </div>
                         
                         <div class="row">
                             <div class="col s12">
-                                <button class="btn waves-effect waves-light blue btn-large full-width" type="submit">
+                                <button class="btn waves-effect waves-light green btn-large full-width" type="submit">
                                     Create Account
                                     <i class="material-icons right">person_add</i>
                                 </button>
@@ -69,7 +71,7 @@
                     <div class="center">
                         <p>
                             Already have an account? 
-                            <a href="{% url 'accounts:login' %}" class="blue-text">Login here</a>
+                            <a href="{% url 'accounts:login' %}" class="green-text">Login here</a>
                         </p>
                     </div>
                 </div>
@@ -96,6 +98,19 @@ document.addEventListener('DOMContentLoaded', function() {
     password.addEventListener('change', validatePassword);
     passwordConfirm.addEventListener('keyup', validatePassword);
 });
+
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const toggle = field.nextElementSibling.nextElementSibling;
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        toggle.textContent = 'visibility';
+    } else {
+        field.type = 'password';
+        toggle.textContent = 'visibility_off';
+    }
+}
 </script>
 {% endblock %}
 {% endblock %}

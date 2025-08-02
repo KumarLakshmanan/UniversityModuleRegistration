@@ -86,10 +86,32 @@ WSGI_APPLICATION = 'course_registration.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'module_registration_v3',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'OPTIONS': {
+            'sql_mode': 'traditional',
+            'init_command': "SET foreign_key_checks = 0;",
+        }
     }
 }
+
+# Disable database version checking and RETURNING clause for MariaDB 10.4.32
+import django.db.backends.mysql.base
+import django.db.backends.mysql.features
+
+class CustomDatabaseFeatures(django.db.backends.mysql.features.DatabaseFeatures):
+    can_return_columns_from_insert = False
+    can_return_rows_from_bulk_insert = False
+
+class CustomDatabaseWrapper(django.db.backends.mysql.base.DatabaseWrapper):
+    features_class = CustomDatabaseFeatures
+    mysql_version = (10, 6, 0)
+
+django.db.backends.mysql.base.DatabaseWrapper = CustomDatabaseWrapper
 
 
 # Password validation
@@ -157,9 +179,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your-email@gmail.com'  # Replace with your Gmail
-EMAIL_HOST_PASSWORD = 'your-app-password'  # Replace with your Gmail app password
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_HOST_USER = 'kumar.lakshmanan.projects@gmail.com'
+EMAIL_HOST_PASSWORD = 'yhkrxirfwzvurbhx'
+DEFAULT_FROM_EMAIL = 'kumar.lakshmanan.projects@gmail.com'
 
 # Login/Logout URLs
 LOGIN_URL = '/login/'

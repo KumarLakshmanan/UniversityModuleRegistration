@@ -6,7 +6,7 @@
 <div class="container section">
     <div class="row">
         <div class="col s12">
-            <h2 class="blue-text">Welcome, {{ student.get_full_name }}!</h2>
+            <h2 class="green-text">Welcome, {{ student.get_full_name }}!</h2>
             <p class="flow-text">Manage your academic journey from your personal dashboard.</p>
         </div>
     </div>
@@ -14,7 +14,7 @@
     <!-- Quick Stats -->
     <div class="row">
         <div class="col s12 m6 l3">
-            <div class="card dashboard-card blue darken-1">
+            <div class="card dashboard-card green darken-1">
                 <div class="card-content white-text dashboard-stat">
                     <h4>{{ total_registrations }}</h4>
                     <p>Registered Modules</p>
@@ -103,7 +103,7 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <a href="{% url 'modules:detail' registration.module.code %}" class="btn-small blue">
+                                        <a href="{% url 'modules:detail' registration.module.code %}" class="btn-small green">
                                             <i class="material-icons">visibility</i>
                                         </a>
                                     </td>
@@ -116,13 +116,13 @@
                             <i class="material-icons large grey-text">school</i>
                             <h5 class="grey-text">No registrations yet</h5>
                             <p>Explore our module catalog and register for your first course!</p>
-                            <a href="{% url 'modules:list' %}" class="btn blue">Browse Modules</a>
+                            <a href="{% url 'modules:list' %}" class="btn green">Browse Modules</a>
                         </div>
                     {% endif %}
                 </div>
                 {% if recent_registrations %}
                 <div class="card-action">
-                    <a href="{% url 'registrations:my_modules' %}" class="blue-text">View All Registrations</a>
+                    <a href="{% url 'registrations:my_modules' %}" class="green-text">View All Registrations</a>
                 </div>
                 {% endif %}
             </div>
@@ -138,23 +138,23 @@
                     </span>
                     
                     <div class="collection">
-                        <a href="{% url 'modules:list' %}" class="collection-item blue-text">
+                        <a href="{% url 'modules:list' %}" class="collection-item green-text">
                             <i class="material-icons left">search</i>
                             Browse Modules
                         </a>
-                        <a href="{% url 'registrations:my_modules' %}" class="collection-item blue-text">
+                        <a href="{% url 'registrations:my_modules' %}" class="collection-item green-text">
                             <i class="material-icons left">list</i>
                             My Registrations
                         </a>
-                        <a href="{% url 'students:profile' %}" class="collection-item blue-text">
+                        <a href="{% url 'students:profile' %}" class="collection-item green-text">
                             <i class="material-icons left">person</i>
                             View Profile
                         </a>
-                        <a href="{% url 'students:profile_edit' %}" class="collection-item blue-text">
+                        <a href="{% url 'students:profile_edit' %}" class="collection-item green-text">
                             <i class="material-icons left">edit</i>
                             Edit Profile
                         </a>
-                        <a href="{% url 'sitecore:contact' %}" class="collection-item blue-text">
+                        <a href="{% url 'sitecore:contact' %}" class="collection-item green-text">
                             <i class="material-icons left">help</i>
                             Get Help
                         </a>
@@ -197,7 +197,7 @@
                         </div>
                         <div class="collection-item">
                             <span class="left">Active Registrations</span>
-                            <span class="right blue-text">{{ total_registrations }}</span>
+                            <span class="right green-text">{{ total_registrations }}</span>
                         </div>
                     </div>
                 </div>

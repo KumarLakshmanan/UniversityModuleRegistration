@@ -25,6 +25,7 @@ class Module(models.Model):
     name = models.CharField(max_length=200)
     code = models.SlugField(max_length=20, unique=True, help_text="Module code (e.g., CS101)")
     description = models.TextField()
+    image_url = models.URLField(blank=True, null=True, help_text="URL for module image")
     
     # Academic Details
     credits = models.PositiveIntegerField(

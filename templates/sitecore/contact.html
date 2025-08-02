@@ -6,7 +6,7 @@
 <div class="container section">
     <div class="row">
         <div class="col s12">
-            <h2 class="center blue-text">Contact Us</h2>
+            <h2 class="center green-text">Contact Us</h2>
             <p class="center flow-text">Have questions? We'd love to hear from you.</p>
         </div>
     </div>
@@ -47,7 +47,7 @@
                         </div>
                         <div class="row">
                             <div class="col s12">
-                                <button class="btn waves-effect waves-light blue" type="submit">
+                                <button class="btn waves-effect waves-light green" type="submit">
                                     Send Message
                                     <i class="material-icons right">send</i>
                                 </button>
@@ -66,23 +66,23 @@
                     
                     <div class="collection">
                         <div class="collection-item">
-                            <i class="material-icons left blue-text">location_on</i>
+                            <i class="material-icons left green-text">location_on</i>
                             <strong>Address</strong><br>
                             123 University Avenue<br>
                             Education City, EC 12345
                         </div>
                         <div class="collection-item">
-                            <i class="material-icons left blue-text">phone</i>
+                            <i class="material-icons left green-text">phone</i>
                             <strong>Phone</strong><br>
                             +1 (555) 123-4567
                         </div>
                         <div class="collection-item">
-                            <i class="material-icons left blue-text">email</i>
+                            <i class="material-icons left green-text">email</i>
                             <strong>Email</strong><br>
                             info@courseregistration.edu
                         </div>
                         <div class="collection-item">
-                            <i class="material-icons left blue-text">schedule</i>
+                            <i class="material-icons left green-text">schedule</i>
                             <strong>Office Hours</strong><br>
                             Monday - Friday: 9:00 AM - 5:00 PM<br>
                             Saturday: 10:00 AM - 2:00 PM<br>
@@ -96,25 +96,25 @@
                 <div class="card-content">
                     <span class="card-title">Quick Links</span>
                     <div class="collection">
-                        <a href="{% url 'modules:list' %}" class="collection-item blue-text">
+                        <a href="{% url 'modules:list' %}" class="collection-item green-text">
                             <i class="material-icons left">school</i>Browse Modules
                         </a>
                         {% if not user.is_authenticated %}
-                            <a href="{% url 'accounts:register' %}" class="collection-item blue-text">
+                            <a href="{% url 'accounts:register' %}" class="collection-item green-text">
                                 <i class="material-icons left">person_add</i>Register Account
                             </a>
-                            <a href="{% url 'accounts:login' %}" class="collection-item blue-text">
+                            <a href="{% url 'accounts:login' %}" class="collection-item green-text">
                                 <i class="material-icons left">login</i>Student Login
                             </a>
                         {% else %}
-                            <a href="{% url 'students:dashboard' %}" class="collection-item blue-text">
+                            <a href="{% url 'students:dashboard' %}" class="collection-item green-text">
                                 <i class="material-icons left">dashboard</i>My Dashboard
                             </a>
-                            <a href="{% url 'registrations:my_modules' %}" class="collection-item blue-text">
+                            <a href="{% url 'registrations:my_modules' %}" class="collection-item green-text">
                                 <i class="material-icons left">list</i>My Modules
                             </a>
                         {% endif %}
-                        <a href="{% url 'sitecore:about' %}" class="collection-item blue-text">
+                        <a href="{% url 'sitecore:about' %}" class="collection-item green-text">
                             <i class="material-icons left">info</i>About Us
                         </a>
                     </div>

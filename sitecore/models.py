@@ -68,6 +68,13 @@ class SystemStats(models.Model):
     def __str__(self):
         return f"Stats for {self.date_recorded.strftime('%Y-%m-%d')}"
 
+    def save(self, *args, **kwargs):
+        """Override save to update stats on creation."""
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        if is_new:
+            self.update_stats()
+
     @classmethod
     def get_latest_stats(cls):
         """Get the latest system statistics."""

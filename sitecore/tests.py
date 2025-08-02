@@ -208,13 +208,17 @@ class ContactMessageModelTestCase(TestCase):
     
     def test_contact_message_ordering(self):
         """Test contact message model ordering."""
-        # Create multiple messages
+        import time
+        
+        # Create multiple messages with small delay
         msg1 = ContactMessage.objects.create(
             name='User 1',
             email='user1@example.com',
             subject='Subject 1',
             message='Message 1'
         )
+        
+        time.sleep(0.001)  # Small delay to ensure different timestamps
         
         msg2 = ContactMessage.objects.create(
             name='User 2',
@@ -223,7 +227,7 @@ class ContactMessageModelTestCase(TestCase):
             message='Message 2'
         )
         
-        # Check ordering (should be by date_created descending)
+        # Check ordering (should be by created_at descending)
         messages = ContactMessage.objects.all()
         self.assertEqual(messages[0], msg2)  # Most recent first
         self.assertEqual(messages[1], msg1)
@@ -346,8 +350,13 @@ class SystemStatsModelTestCase(TestCase):
     
     def test_system_stats_ordering(self):
         """Test system stats model ordering."""
-        # Create multiple stats entries
+        import time
+        
+        # Create multiple stats entries with small delay
         stats1 = SystemStats.objects.create()
+        
+        time.sleep(0.001)  # Small delay to ensure different timestamps
+        
         stats2 = SystemStats.objects.create()
         
         # Check ordering (should be by date_recorded descending)

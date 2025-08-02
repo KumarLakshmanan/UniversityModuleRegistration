@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification - Course Registration System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+            border: 1px solid #e9ecef;
+        }
+        .otp-code {
+            background: #4caf50;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            letter-spacing: 4px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 12px;
+        }
+        .btn {
+            display: inline-block;
+            background: #4caf50;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Course Registration System</h1>
+        <h2>Email Verification</h2>
+    </div>
+    
+    <div class="content">
+        <h3>Hello {{ user.first_name }}!</h3>
+        
+        <p>Thank you for registering with our Course Registration System. To complete your account setup, please verify your email address using the verification code below:</p>
+        
+        <div class="otp-code">{{ otp_code }}</div>
+        
+        <p>This verification code will expire in {{ expiry_minutes }} minutes.</p>
+        
+        <p>If you didn't create an account with us, please ignore this email.</p>
+        
+        <p>Best regards,<br>Course Registration System Team</p>
+    </div>
+    
+    <div class="footer">
+        <p>© 2025 Course Registration System. All rights reserved.</p>
+    </div>
+</body>
+</html>

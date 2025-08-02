@@ -60,8 +60,8 @@ class AccountsViewsTestCase(TestCase):
             'username': 'testuser',
             'password': 'TestPass123!'
         })
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Please verify your email')
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('accounts:verify_email'))
     
     def test_login_invalid_credentials(self):
         """Test login with invalid credentials."""
