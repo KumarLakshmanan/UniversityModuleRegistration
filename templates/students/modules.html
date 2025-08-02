@@ -54,7 +54,7 @@
                     </div>
                     
                     <div class="flex gap-2">
-                        <a href="{% url 'modules:module_detail' module.id %}" 
+                        <a href="{% url 'modules:module_detail' module.code %}" 
                            class="text-red-600 hover:text-red-800 text-sm font-medium">
                             View Details
                         </a>
@@ -62,7 +62,7 @@
                         {% if module.is_registered %}
                             <span class="text-green-600 text-sm font-medium">✓ Registered</span>
                         {% else %}
-                            <a href="{% url 'students:register_module' module.id %}" 
+                            <a href="{% url 'students:register_module' module.code %}" 
                                class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition">
                                 Register
                             </a>

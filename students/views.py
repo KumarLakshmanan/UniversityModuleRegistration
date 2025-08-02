@@ -168,7 +168,7 @@ def registrations_view(request):
 
 @login_required
 @csrf_protect
-def register_module_view(request, module_id):
+def register_module_view(request, module_code):
     """Register for a module"""
     try:
         student = Student.objects.get(user=request.user)
@@ -176,7 +176,7 @@ def register_module_view(request, module_id):
         messages.error(request, 'Please complete your student profile first.')
         return redirect('students:profile_setup')
     
-    module = get_object_or_404(Module, id=module_id, is_active=True)
+    module = get_object_or_404(Module, code=module_code, is_active=True)
     
     # Check if already registered
     if Registration.objects.filter(student=student, module=module).exists():
@@ -205,7 +205,7 @@ def register_module_view(request, module_id):
 
 @login_required
 @csrf_protect
-def unregister_module_view(request, module_id):
+def unregister_module_view(request, module_code):
     """Unregister from a module"""
     try:
         student = Student.objects.get(user=request.user)
@@ -213,7 +213,7 @@ def unregister_module_view(request, module_id):
         messages.error(request, 'Student profile not found.')
         return redirect('students:profile_setup')
     
-    module = get_object_or_404(Module, id=module_id)
+    module = get_object_or_404(Module, code=module_code)
     
     try:
         registration = Registration.objects.get(student=student, module=module)

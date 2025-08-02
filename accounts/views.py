@@ -6,6 +6,8 @@ from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 from django.urls import reverse
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from django.conf import settings
 from django.utils import timezone
 from django.http import JsonResponse
@@ -19,6 +21,40 @@ from students.models import Student
 def generate_otp():
     """Generate a 6-digit OTP"""
     return ''.join(random.choices(string.digits, k=6))
+
+
+def send_otp_email(user, otp_code, otp_type='REGISTER'):
+    """Send OTP email to user"""
+    try:
+        if otp_type == 'REGISTER':
+            subject = 'Email Verification - University Module Registration System'
+            html_template = 'emails/otp_verification.html'
+            text_template = 'emails/otp_verification.txt'
+        else:
+            subject = 'Password Reset - University Module Registration System'
+            html_template = 'emails/password_reset.html'
+            text_template = 'emails/password_reset.txt'
+        
+        context = {
+            'user': user,
+            'otp_code': otp_code,
+        }
+        
+        html_message = render_to_string(html_template, context)
+        plain_message = render_to_string(text_template, context)
+        
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+        return True
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        return False
 
 
 @csrf_protect
@@ -66,12 +102,16 @@ def register_view(request):
             OTPVerification.objects.create(
                 user=user,
                 otp_code=otp_code,
+                otp_type='REGISTER',
                 expires_at=timezone.now() + timezone.timedelta(minutes=15)
             )
             
-            # In a real application, send email here
-            # For now, we'll just show a message
-            messages.success(request, f'Registration successful! Please verify your email with OTP: {otp_code}')
+            # Send OTP email
+            if send_otp_email(user, otp_code, 'REGISTER'):
+                messages.success(request, 'Registration successful! Please check your email for the verification code.')
+            else:
+                messages.warning(request, f'Registration successful! Your verification code is: {otp_code} (Email sending failed)')
+            
             return redirect('accounts:verify_otp', user_id=user.id)
             
         except Exception as e:
@@ -95,17 +135,44 @@ def login_view(request):
             messages.error(request, 'Username and password are required.')
             return render(request, 'accounts/login.html')
         
-        user = authenticate(request, username=username, password=password)
+        # Try to get user by username or email
+        user = None
+        if '@' in username:
+            # Login with email
+            try:
+                user_obj = User.objects.get(email=username)
+                user = authenticate(request, username=user_obj.username, password=password)
+            except User.DoesNotExist:
+                pass
+        else:
+            # Login with username
+            user = authenticate(request, username=username, password=password)
+        
         if user is not None:
             if user.is_active:
                 login(request, user)
                 next_url = request.GET.get('next', 'students:dashboard')
                 return redirect(next_url)
             else:
-                messages.error(request, 'Account is not verified. Please verify your email.')
+                # User exists but not verified
+                messages.info(request, 'Your account is not verified. Please check your email for the verification code.')
                 return redirect('accounts:verify_otp', user_id=user.id)
         else:
-            messages.error(request, 'Invalid username or password.')
+            # Check if user exists but not verified
+            try:
+                if '@' in username:
+                    user_obj = User.objects.get(email=username)
+                else:
+                    user_obj = User.objects.get(username=username)
+                
+                if not user_obj.is_active:
+                    # User exists but password might be wrong and not verified
+                    messages.error(request, 'Account not verified. Please verify your email first.')
+                    return redirect('accounts:verify_otp', user_id=user_obj.id)
+                else:
+                    messages.error(request, 'Invalid username or password.')
+            except User.DoesNotExist:
+                messages.error(request, 'Invalid username or password.')
     
     return render(request, 'accounts/login.html')
 
@@ -170,10 +237,16 @@ def resend_otp_view(request, user_id):
         OTPVerification.objects.create(
             user=user,
             otp_code=otp_code,
+            otp_type='REGISTER',
             expires_at=timezone.now() + timezone.timedelta(minutes=15)
         )
         
-        messages.success(request, f'New OTP sent: {otp_code}')
+        # Send OTP email
+        if send_otp_email(user, otp_code, 'REGISTER'):
+            messages.success(request, 'New verification code sent to your email.')
+        else:
+            messages.warning(request, f'New verification code: {otp_code} (Email sending failed)')
+        
         return redirect('accounts:verify_otp', user_id=user.id)
         
     except User.DoesNotExist:

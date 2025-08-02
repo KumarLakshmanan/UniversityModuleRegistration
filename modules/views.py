@@ -26,7 +26,19 @@ def module_list_view(request):
     credits = request.GET.get('credits')
     if credits:
         modules = modules.filter(credits=credits)
-    
+
+    if request.user.is_authenticated:
+        try:
+            student = Student.objects.get(user=request.user)
+            # Get student's current registrations
+            student_registrations = Registration.objects.filter(student=student).values_list('module_id', flat=True)
+            
+            # Add registration status to modules
+            for module in modules:
+                module.is_registered = module.id in student_registrations
+        except Student.DoesNotExist:
+            pass
+
     # Pagination
     paginator = Paginator(modules, 12)  # Show 12 modules per page
     page_number = request.GET.get('page')
@@ -44,9 +56,9 @@ def module_list_view(request):
     return render(request, 'modules/module_list.html', context)
 
 
-def module_detail_view(request, module_id):
+def module_detail_view(request, code):
     """Detailed view of a module"""
-    module = get_object_or_404(Module, id=module_id, is_active=True)
+    module = get_object_or_404(Module, code=code, is_active=True)
     
     # Check if user is authenticated and registered for this module
     is_registered = False
