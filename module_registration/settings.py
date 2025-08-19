@@ -99,21 +99,39 @@ WSGI_APPLICATION = 'module_registration.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'mysql_backend',  # Use our custom backend for MariaDB 10.4.32
-        'NAME': 'module_registration_v1',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '3306',
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-            'sql_mode': 'STRICT_TRANS_TABLES',
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        },
+import os
+try:
+    import MySQLdb
+    # Try to connect to MariaDB
+    MySQLdb.connect(host='localhost', user='root', password='', db='module_registration_v1')
+    # If successful, use MariaDB
+    DATABASES = {
+        'default': {
+            'ENGINE': 'university_system.db_backends.mysql',
+            'NAME': 'module_registration_v1',
+            'USER': 'root',
+            'PASSWORD': '',
+            'HOST': 'localhost',
+            'PORT': '3306',
+            'OPTIONS': {
+                'sql_mode': 'traditional',
+                'charset': 'utf8mb4',
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            },
+            'TEST': {
+                'CHARSET': 'utf8mb4',
+                'COLLATION': 'utf8mb4_unicode_ci',
+            }
+        }
     }
-}
+except:
+    # Fallback to SQLite if MariaDB is not available
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # For MySQL/MariaDB (requires MariaDB 10.5+ or MySQL 8.0+):
 # DATABASES = {

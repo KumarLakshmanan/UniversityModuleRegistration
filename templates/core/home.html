@@ -1,7 +1,7 @@
 {% extends 'base/base.html' %}
 {% load static %}
 
-{% block title %}Home - University Module Registration System{% endblock %}
+{% block title %}Home - University Course Registration System{% endblock %}
 
 {% block content %}
 <!-- Section 1: Hero Section -->
@@ -10,21 +10,21 @@
         <div class="row align-items-center">
             <div class="col-lg-6">
                 <h1 class="fade-in-up">Welcome to University Portal</h1>
-                <p class="lead fade-in-up">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+                <p class="lead fade-in-up">Discover comprehensive courses designed to enhance your skills and knowledge. Join thousands of students in our interactive learning platform.</p>
                 <div class="fade-in-up">
                     {% if user.is_authenticated %}
                         <a href="{% url 'students:dashboard' %}" class="btn btn-light btn-lg me-3">
                             <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
                         </a>
                         <a href="{% url 'modules:list' %}" class="btn btn-outline-light btn-lg">
-                            <i class="fas fa-book me-2"></i>Browse Modules
+                            <i class="fas fa-book me-2"></i>Browse Courses
                         </a>
                     {% else %}
                         <a href="{% url 'students:register' %}" class="btn btn-light btn-lg me-3">
                             <i class="fas fa-user-plus me-2"></i>Get Started
                         </a>
                         <a href="{% url 'modules:list' %}" class="btn btn-outline-light btn-lg">
-                            <i class="fas fa-book me-2"></i>Browse Modules
+                            <i class="fas fa-book me-2"></i>Browse Courses
                         </a>
                     {% endif %}
                 </div>
@@ -42,8 +42,14 @@
         <div class="row">
             <div class="col-md-3">
                 <div class="stat-item fade-in-up">
+                    <span class="stat-number count-up" data-count="{{ total_courses }}">0</span>
+                    <span class="stat-label">Available Courses</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item fade-in-up">
                     <span class="stat-number count-up" data-count="{{ total_modules }}">0</span>
-                    <span class="stat-label">Available Modules</span>
+                    <span class="stat-label">Course Modules</span>
                 </div>
             </div>
             <div class="col-md-3">
@@ -55,62 +61,89 @@
             <div class="col-md-3">
                 <div class="stat-item fade-in-up">
                     <span class="stat-number count-up" data-count="{{ total_registrations }}">0</span>
-                    <span class="stat-label">Module Registrations</span>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-item fade-in-up">
-                    <span class="stat-number count-up" data-count="100">0</span>
-                    <span class="stat-label">Success Rate %</span>
+                    <span class="stat-label">Course Enrollments</span>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Section 3: Services Section -->
+<!-- Section 3: Featured Courses -->
 <section class="py-5">
     <div class="container">
         <div class="row">
             <div class="col-lg-12 text-center mb-5">
+                <h2 class="fade-in-up">Featured Courses</h2>
+                <p class="lead text-muted fade-in-up">Explore our most popular courses designed by industry experts</p>
+            </div>
+        </div>
+        <div class="row">
+            {% for course in featured_courses %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 fade-in-up">
+                    <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=200&fit=crop&crop=center" class="card-img-top" alt="{{ course.name }}">
+                    <div class="card-body">
+                        <span class="badge bg-primary mb-2">{{ course.get_category_display }}</span>
+                        <h5 class="card-title">{{ course.name }}</h5>
+                        <p class="card-text">{{ course.description|truncatewords:15 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">{{ course.total_credits }} credits</small>
+                            <a href="{% url 'modules:course_detail' pk=course.pk %}" class="btn btn-primary btn-sm">
+                                View Course
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p class="text-muted">No featured courses available at the moment.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Section 4: Services Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center mb-5">
                 <h2 class="fade-in-up">Our Services</h2>
-                <p class="lead text-muted fade-in-up">Lorem ipsum dolor sit amet consectetur adipiscing elit</p>
+                <p class="lead text-muted fade-in-up">Comprehensive learning platform with modern features</p>
             </div>
         </div>
         <div class="row">
             <div class="col-md-4 mb-4">
                 <div class="card h-100 fade-in-up">
-                    <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=200&fit=crop&crop=center" class="card-img-top" alt="Service 1">
                     <div class="card-body text-center">
                         <div class="card-icon">
-                            <i class="fas fa-book-open"></i>
+                            <i class="fas fa-graduation-cap fa-3x text-primary mb-3"></i>
                         </div>
-                        <h5 class="card-title">Module Management</h5>
-                        <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                        <h5 class="card-title">Course Management</h5>
+                        <p class="card-text">Streamlined course registration with real-time availability and automated scheduling.</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
                 <div class="card h-100 fade-in-up">
-                    <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300&h=200&fit=crop&crop=center" class="card-img-top" alt="Service 2">
                     <div class="card-body text-center">
                         <div class="card-icon">
-                            <i class="fas fa-cloud"></i>
+                            <i class="fas fa-cloud fa-3x text-primary mb-3"></i>
                         </div>
-                        <h5 class="card-title">Cloud Reliability</h5>
-                        <p class="card-text">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                        <h5 class="card-title">Cloud Platform</h5>
+                        <p class="card-text">Reliable cloud-based infrastructure ensuring 24/7 availability and seamless user experience.</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
                 <div class="card h-100 fade-in-up">
-                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop&crop=center" class="card-img-top" alt="Service 3">
                     <div class="card-body text-center">
                         <div class="card-icon">
-                            <i class="fas fa-user-graduate"></i>
+                            <i class="fas fa-user-graduate fa-3x text-primary mb-3"></i>
                         </div>
                         <h5 class="card-title">Student Experience</h5>
-                        <p class="card-text">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                        <p class="card-text">Intuitive dashboard and personalized learning paths to enhance your educational journey.</p>
                     </div>
                 </div>
             </div>
@@ -118,8 +151,8 @@
     </div>
 </section>
 
-<!-- Section 4: Why Choose Us Section -->
-<section class="py-5 bg-light">
+<!-- Section 5: Why Choose Us Section -->
+<section class="py-5">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6">
@@ -131,7 +164,7 @@
                         </div>
                         <div class="flex-grow-1 ms-3">
                             <h5>Secure & Reliable</h5>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.</p>
+                            <p>Advanced security measures and reliable infrastructure to protect your data and ensure smooth learning.</p>
                         </div>
                     </div>
                     <div class="d-flex mb-3">
@@ -140,7 +173,7 @@
                         </div>
                         <div class="flex-grow-1 ms-3">
                             <h5>User-Friendly Interface</h5>
-                            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo.</p>
+                            <p>Intuitive design that makes course registration and management simple and efficient for all users.</p>
                         </div>
                     </div>
                     <div class="d-flex mb-3">
@@ -149,7 +182,7 @@
                         </div>
                         <div class="flex-grow-1 ms-3">
                             <h5>Real-time Updates</h5>
-                            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim.</p>
+                            <p>Instant notifications and updates on course availability, schedule changes, and important announcements.</p>
                         </div>
                     </div>
                 </div>

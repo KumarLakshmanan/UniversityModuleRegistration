@@ -1,0 +1,7 @@
+in courses the 
+Registered
+Available is not showing. 
+
+please get that values from the list of modules from the course.
+
+and in the dashboard the registration.module.get_category_display is showing as empty.

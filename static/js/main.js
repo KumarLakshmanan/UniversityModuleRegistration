@@ -60,11 +60,11 @@ function animateCountUp() {
 
 // AJAX Module Registration/Unregistration
 function setupModuleRegistration() {
-    // Registration button
+    // Registration button (works for both modules and courses)
     $(document).on('click', '.btn-register', function(e) {
         e.preventDefault();
         var $btn = $(this);
-        var moduleCode = $btn.data('module');
+        var itemCode = $btn.data('module') || $btn.data('course');
         var url = $btn.data('url');
         
         $btn.prop('disabled', true);
@@ -80,7 +80,7 @@ function setupModuleRegistration() {
                 if (response.success) {
                     showAlert('success', response.message);
                     updateRegistrationButton($btn, 'unregister');
-                    updateStudentCount(moduleCode, 1);
+                    updateStudentCount(itemCode, 1);
                 } else {
                     showAlert('error', response.message);
                 }
@@ -94,14 +94,15 @@ function setupModuleRegistration() {
         });
     });
     
-    // Unregistration button
+    // Unregistration button (works for both modules and courses)
     $(document).on('click', '.btn-unregister', function(e) {
         e.preventDefault();
         var $btn = $(this);
-        var moduleCode = $btn.data('module');
+        var itemCode = $btn.data('module') || $btn.data('course');
         var url = $btn.data('url');
+        var itemType = $btn.data('course') ? 'course' : 'module';
         
-        if (!confirm('Are you sure you want to unregister from this module?')) {
+        if (!confirm(`Are you sure you want to unregister from this ${itemType}?`)) {
             return;
         }
         
@@ -118,7 +119,7 @@ function setupModuleRegistration() {
                 if (response.success) {
                     showAlert('success', response.message);
                     updateRegistrationButton($btn, 'register');
-                    updateStudentCount(moduleCode, -1);
+                    updateStudentCount(itemCode, -1);
                 } else {
                     showAlert('error', response.message);
                 }
@@ -135,22 +136,24 @@ function setupModuleRegistration() {
 
 // Update registration button state
 function updateRegistrationButton($btn, action) {
+    var itemType = $btn.data('course') ? 'Course' : '';
+    
     if (action === 'register') {
         $btn.removeClass('btn-danger btn-unregister')
             .addClass('btn-primary btn-register')
-            .html('<i class="fas fa-user-plus me-2"></i>Register')
+            .html(`<i class="fas fa-user-plus me-2"></i>Register${itemType ? ' for ' + itemType : ''}`)
             .data('url', $btn.data('register-url'));
     } else {
         $btn.removeClass('btn-primary btn-register')
             .addClass('btn-danger btn-unregister')
-            .html('<i class="fas fa-user-minus me-2"></i>Unregister')
+            .html(`<i class="fas fa-user-minus me-2"></i>Unregister${itemType ? ' from ' + itemType : ''}`)
             .data('url', $btn.data('unregister-url'));
     }
 }
 
 // Update student count display
-function updateStudentCount(moduleCode, change) {
-    var $count = $('.student-count[data-module="' + moduleCode + '"]');
+function updateStudentCount(itemCode, change) {
+    var $count = $('.student-count[data-module="' + itemCode + '"], .student-count[data-course="' + itemCode + '"]');
     if ($count.length) {
         var currentCount = parseInt($count.text()) || 0;
         $count.text(currentCount + change);

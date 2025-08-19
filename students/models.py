@@ -36,6 +36,10 @@ class Student(models.Model):
     def registered_modules_count(self):
         return self.registrations.count()
 
+    @property 
+    def registered_courses_count(self):
+        return self.course_registrations.count()
+
 
 class EmailVerification(models.Model):
     """Model to handle email verification via OTP"""

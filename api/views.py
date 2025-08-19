@@ -6,7 +6,7 @@ from rest_framework.pagination import PageNumberPagination
 from django.contrib.auth.models import User
 from django_filters.rest_framework import DjangoFilterBackend
 from students.models import Student
-from modules.models import Module, Registration
+from modules.models import Course, Module, Registration
 from rest_framework import serializers
 import requests
 
@@ -34,14 +34,27 @@ class StudentSerializer(serializers.ModelSerializer):
 
 
 class ModuleSerializer(serializers.ModelSerializer):
-    registered_students_count = serializers.ReadOnlyField()
+    course_name = serializers.CharField(source='course.name', read_only=True)
+    course_code = serializers.CharField(source='course.code', read_only=True)
+    current_enrollment = serializers.ReadOnlyField()
     available_spots = serializers.ReadOnlyField()
     is_full = serializers.ReadOnlyField()
     
     class Meta:
         model = Module
-        fields = ['id', 'name', 'code', 'credit', 'category', 'description', 'availability', 
-                 'max_students', 'registered_students_count', 'available_spots', 'is_full']
+        fields = ['id', 'name', 'code', 'credit', 'description', 'availability', 'max_students', 
+                 'current_enrollment', 'available_spots', 'is_full', 'course_name', 'course_code']
+
+
+class CourseSerializer(serializers.ModelSerializer):
+    total_credits = serializers.ReadOnlyField()
+    total_modules = serializers.ReadOnlyField()
+    modules = ModuleSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = Course
+        fields = ['id', 'name', 'code', 'category', 'description', 
+                 'total_credits', 'total_modules', 'modules']
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -54,6 +67,19 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 
 # ViewSets
+class CourseViewSet(viewsets.ReadOnlyModelViewSet):
+    """API viewset for courses with pagination and filtering"""
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['category']
+    search_fields = ['name', 'code', 'description']
+    ordering_fields = ['name', 'code', 'created_at']
+    ordering = ['name']
+
+
 class ModuleViewSet(viewsets.ReadOnlyModelViewSet):
     """API viewset for modules with pagination and filtering"""
     queryset = Module.objects.filter(availability=True)
@@ -61,8 +87,8 @@ class ModuleViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = StandardResultsSetPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['category', 'credit', 'availability']
-    search_fields = ['name', 'code', 'description']
+    filterset_fields = ['course__category', 'credit', 'course', 'availability']
+    search_fields = ['name', 'code', 'description', 'course__name']
     ordering_fields = ['name', 'code', 'credit', 'created_at']
     ordering = ['name']
     
@@ -89,7 +115,7 @@ class StudentViewSet(viewsets.ReadOnlyModelViewSet):
     
     @action(detail=True, methods=['get'])
     def modules(self, request, pk=None):
-        """Get modules for a specific student"""
+        """Get registered modules for a specific student"""
         student = self.get_object()
         registrations = student.registrations.all()
         serializer = RegistrationSerializer(registrations, many=True)
@@ -97,13 +123,13 @@ class StudentViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class RegistrationViewSet(viewsets.ReadOnlyModelViewSet):
-    """API viewset for registrations with pagination and filtering"""
+    """API viewset for module registrations with pagination and filtering"""
     queryset = Registration.objects.all()
     serializer_class = RegistrationSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = StandardResultsSetPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['module__category', 'module__credit']
+    filterset_fields = ['module__course__category', 'module__credit']
     search_fields = ['student__user__username', 'module__name', 'module__code']
     ordering_fields = ['date_registered', 'module__name']
     ordering = ['-date_registered']

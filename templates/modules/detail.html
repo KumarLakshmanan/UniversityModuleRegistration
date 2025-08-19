@@ -1,146 +1,279 @@
 {% extends 'base/base.html' %}
+{% load static %}
 
-{% block title %}{{ module.name }} - University Module Registration System{% endblock %}
+{% block title %}{{ course.name }} - Course Details{% endblock %}
+
+{% block extra_css %}
+<style>
+    .course-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 60px 0;
+        margin-bottom: 30px;
+    }
+    .module-card {
+        transition: all 0.3s ease;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    .module-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+    .module-status {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+    }
+    .enrollment-info {
+        background: #f8f9fa;
+        border-radius: 5px;
+        padding: 10px;
+        margin-top: 10px;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row">
-        <!-- Module Information -->
-        <div class="col-lg-8">
-            <div class="card module-card">
-                <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&h=300&fit=crop&crop=center&auto=format&q=60" class="card-img-top" alt="{{ module.name }}" style="height: 300px; object-fit: cover;">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <span class="module-code me-2">{{ module.code }}</span>
-                            <span class="module-category">{{ module.get_category_display }}</span>
+<!-- Course Header -->
+<section class="course-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-white-50">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'modules:list' %}" class="text-white-50">Courses</a></li>
+                        <li class="breadcrumb-item active text-white" aria-current="page">{{ course.name }}</li>
+                    </ol>
+                </nav>
+                <h1 class="display-4 mb-3">{{ course.name }}</h1>
+                <p class="lead mb-4">{{ course.description }}</p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-tag me-2"></i>
+                            <strong>Category:</strong>
+                            <span class="ms-2">{{ course.get_category_display }}</span>
                         </div>
-                        <div>
-                            {% if module.availability %}
-                                {% if module.is_full %}
-                                    <span class="registration-status status-full">Full</span>
-                                {% else %}
-                                    <span class="registration-status status-available">Available</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="registration-status status-full">Unavailable</span>
-                            {% endif %}
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-book me-2"></i>
+                            <strong>Total Modules:</strong>
+                            <span class="ms-2">{{ course.total_modules }}</span>
                         </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h1 class="card-title">{{ module.name }}</h1>
-                    <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-                    
-                    <div class="row mb-4">
-                        <div class="col-md-3">
-                            <strong>Credits:</strong><br>
-                            <span class="module-credit">{{ module.credit }}</span>
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Category:</strong><br>
-                            {{ module.get_category_display }}
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Enrolled:</strong><br>
-                            <span class="student-count" data-module="{{ module.code }}">{{ module.registered_students_count }}</span> / {{ module.max_students }}
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Available Spots:</strong><br>
-                            {{ module.available_spots }}
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-credit-card me-2"></i>
+                            <strong>Total Credits:</strong>
+                            <span class="ms-2">{{ course.total_credits }}</span>
                         </div>
                     </div>
-                    
-                    <!-- Registration Button -->
-                    {% if user.is_authenticated %}
-                        {% if is_registered %}
-                            <button class="btn btn-danger btn-unregister" 
-                                    data-module="{{ module.code }}" 
-                                    data-url="{% url 'modules:unregister' code=module.code %}"
-                                    data-register-url="{% url 'modules:register' code=module.code %}"
-                                    data-unregister-url="{% url 'modules:unregister' code=module.code %}">
-                                <i class="fas fa-user-minus me-2"></i>Unregister
-                            </button>
-                        {% else %}
-                            {% if module.availability and not module.is_full %}
-                                <button class="btn btn-primary btn-register" 
-                                        data-module="{{ module.code }}" 
-                                        data-url="{% url 'modules:register' code=module.code %}"
-                                        data-register-url="{% url 'modules:register' code=module.code %}"
-                                        data-unregister-url="{% url 'modules:unregister' code=module.code %}">
-                                    <i class="fas fa-user-plus me-2"></i>Register
-                                </button>
-                            {% else %}
-                                <button class="btn btn-secondary" disabled>
-                                    <i class="fas fa-times me-2"></i>
-                                    {% if not module.availability %}Not Available{% else %}Full{% endif %}
-                                </button>
-                            {% endif %}
-                        {% endif %}
-                    {% else %}
-                        <a href="{% url 'students:login' %}" class="btn btn-primary">
-                            <i class="fas fa-sign-in-alt me-2"></i>Login to Register
-                        </a>
-                    {% endif %}
                 </div>
             </div>
         </div>
-        
-        <!-- Registered Students -->
-        <div class="col-lg-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="fas fa-users me-2"></i>Registered Students
-                    </h5>
+    </div>
+</section>
+
+<!-- Modules Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Course Modules</h2>
+                    {% if not user.is_authenticated %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Please <a href="{% url 'students:login' %}">login</a> to register for modules.
+                        </div>
+                    {% endif %}
                 </div>
-                <div class="card-body">
-                    {% if registered_students %}
-                        <div class="list-group list-group-flush">
-                            {% for registration in registered_students %}
-                            <div class="list-group-item px-0">
-                                <div class="d-flex align-items-center">
-                                    {% if registration.student.photo %}
-                                        <img src="{{ registration.student.photo.url }}" 
-                                             alt="{{ registration.student.full_name }}" 
-                                             class="rounded-circle me-3" 
-                                             width="40" height="40">
+                
+                {% if modules %}
+                    <div class="row">
+                        {% for module in modules %}
+                        <div class="col-lg-6 col-xl-4 mb-4">
+                            <div class="card module-card h-100">
+                                <div class="card-body">
+                                    <!-- Module Status Badge -->
+                                    {% if module.id in registered_modules %}
+                                        <span class="badge bg-success module-status">
+                                            <i class="fas fa-check me-1"></i>Registered
+                                        </span>
+                                    {% elif not module.availability %}
+                                        <span class="badge bg-secondary module-status">
+                                            <i class="fas fa-lock me-1"></i>Unavailable
+                                        </span>
+                                    {% elif module.is_full %}
+                                        <span class="badge bg-danger module-status">
+                                            <i class="fas fa-times me-1"></i>Full
+                                        </span>
                                     {% else %}
-                                        <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-3" 
-                                             style="width: 40px; height: 40px;">
-                                            <i class="fas fa-user text-white"></i>
-                                        </div>
+                                        <span class="badge bg-primary module-status">
+                                            <i class="fas fa-plus me-1"></i>Available
+                                        </span>
                                     {% endif %}
-                                    <div class="flex-grow-1">
-                                        <strong>{{ registration.student.full_name }}</strong><br>
-                                        <small class="text-muted">
-                                            Registered: {{ registration.date_registered|date:"M d, Y" }}
-                                        </small>
+
+                                    <h5 class="card-title">{{ module.name }}</h5>
+                                    <p class="text-muted small mb-2">{{ module.code }}</p>
+                                    <p class="card-text">{{ module.description|truncatewords:20 }}</p>
+                                    
+                                    <!-- Module Info -->
+                                    <div class="enrollment-info">
+                                        <div class="row text-center">
+                                            <div class="col-4">
+                                                <small class="text-muted d-block">Credits</small>
+                                                <strong>{{ module.credit }}</strong>
+                                            </div>
+                                            <div class="col-4">
+                                                <small class="text-muted d-block">Enrolled</small>
+                                                <strong>{{ module.current_enrollment }}</strong>
+                                            </div>
+                                            <div class="col-4">
+                                                <small class="text-muted d-block">Available</small>
+                                                <strong>{{ module.available_spots }}</strong>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                                
+                                <!-- Registration Actions -->
+                                <div class="card-footer bg-white border-top-0">
+                                    {% if user.is_authenticated %}
+                                        {% if module.id in registered_modules %}
+                                            <!-- Unregister Button -->
+                                            <button class="btn btn-outline-danger btn-sm w-100 unregister-btn" 
+                                                    data-module-code="{{ module.code }}" 
+                                                    data-module-name="{{ module.name }}">
+                                                <i class="fas fa-minus me-1"></i>Unregister
+                                            </button>
+                                        {% elif module.availability and not module.is_full %}
+                                            <!-- Register Button -->
+                                            <button class="btn btn-primary btn-sm w-100 register-btn" 
+                                                    data-module-code="{{ module.code }}" 
+                                                    data-module-name="{{ module.name }}">
+                                                <i class="fas fa-plus me-1"></i>Register
+                                            </button>
+                                        {% else %}
+                                            <!-- Cannot Register -->
+                                            <button class="btn btn-secondary btn-sm w-100" disabled>
+                                                {% if not module.availability %}
+                                                    <i class="fas fa-lock me-1"></i>Not Available
+                                                {% else %}
+                                                    <i class="fas fa-times me-1"></i>Full
+                                                {% endif %}
+                                            </button>
+                                        {% endif %}
+                                    {% else %}
+                                        <a href="{% url 'students:login' %}" class="btn btn-outline-primary btn-sm w-100">
+                                            <i class="fas fa-sign-in-alt me-1"></i>Login to Register
+                                        </a>
+                                    {% endif %}
+                                </div>
                             </div>
-                            {% endfor %}
                         </div>
-                    {% else %}
-                        <div class="text-center py-4">
-                            <i class="fas fa-user-slash fa-2x text-muted mb-2"></i>
-                            <p class="text-muted">No students registered yet.</p>
-                        </div>
-                    {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No modules available</h4>
+                        <p class="text-muted">This course doesn't have any modules available for registration yet.</p>
+                    </div>
+                {% endif %}
+                
+                <!-- Back to Courses -->
+                <div class="text-center mt-5">
+                    <a href="{% url 'modules:list' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Courses
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Navigation -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <a href="{% url 'modules:list' %}" class="btn btn-outline-primary">
-                <i class="fas fa-arrow-left me-2"></i>Back to Modules
-            </a>
-        </div>
-    </div>
-</div>
+</section>
+{% endblock %}
 
-{% csrf_token %}
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Register for module
+    $('.register-btn').click(function() {
+        const moduleCode = $(this).data('module-code');
+        const moduleName = $(this).data('module-name');
+        const button = $(this);
+        
+        button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Registering...');
+        
+        $.post(`/courses/modules/${moduleCode}/register/`, {
+            'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+        })
+        .done(function(data) {
+            if (data.success) {
+                showMessage(data.message, 'success');
+                // Refresh the page to update the UI
+                location.reload();
+            } else {
+                showMessage(data.message, 'error');
+                button.prop('disabled', false).html('<i class="fas fa-plus me-1"></i>Register');
+            }
+        })
+        .fail(function() {
+            showMessage('An error occurred. Please try again.', 'error');
+            button.prop('disabled', false).html('<i class="fas fa-plus me-1"></i>Register');
+        });
+    });
+    
+    // Unregister from module
+    $('.unregister-btn').click(function() {
+        const moduleCode = $(this).data('module-code');
+        const moduleName = $(this).data('module-name');
+        const button = $(this);
+        
+        if (confirm(`Are you sure you want to unregister from ${moduleName}?`)) {
+            button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Unregistering...');
+            
+            $.post(`/courses/modules/${moduleCode}/unregister/`, {
+                'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+            })
+            .done(function(data) {
+                if (data.success) {
+                    showMessage(data.message, 'success');
+                    // Refresh the page to update the UI
+                    location.reload();
+                } else {
+                    showMessage(data.message, 'error');
+                    button.prop('disabled', false).html('<i class="fas fa-minus me-1"></i>Unregister');
+                }
+            })
+            .fail(function() {
+                showMessage('An error occurred. Please try again.', 'error');
+                button.prop('disabled', false).html('<i class="fas fa-minus me-1"></i>Unregister');
+            });
+        }
+    });
+    
+    function showMessage(message, type) {
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        
+        const alertHtml = `
+            <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                <i class="fas ${icon} me-2"></i>${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        
+        // Insert at the top of the main container
+        $('.container').first().prepend(alertHtml);
+        
+        // Auto-hide success messages after 5 seconds
+        if (type === 'success') {
+            setTimeout(function() {
+                $('.alert-success').fadeOut();
+            }, 5000);
+        }
+    }
+});
+</script>
 {% endblock %}

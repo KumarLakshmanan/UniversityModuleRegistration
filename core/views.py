@@ -5,7 +5,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.db.models import Count
 from students.models import Student
-from modules.models import Module, Registration
+from modules.models import Course, Module, Registration
 from .models import Contact
 import requests
 
@@ -17,10 +17,11 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'total_modules': Module.objects.filter(availability=True).count(),
+            'total_modules': Module.objects.count(),
+            'total_courses': Course.objects.count(),
             'total_students': Student.objects.count(),
             'total_registrations': Registration.objects.count(),
-            'featured_modules': Module.objects.filter(availability=True)[:3],
+            'featured_courses': Course.objects.all()[:3],
         })
         return context
 

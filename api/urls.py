@@ -6,9 +6,10 @@ from . import views
 app_name = 'api'
 
 router = DefaultRouter()
+router.register(r'courses', views.CourseViewSet)
 router.register(r'modules', views.ModuleViewSet)
 router.register(r'students', views.StudentViewSet)
-router.register(r'registrations', views.RegistrationViewSet)
+router.register(r'registrations', views.RegistrationViewSet)  # Module registrations
 
 urlpatterns = [
     path('', include(router.urls)),
