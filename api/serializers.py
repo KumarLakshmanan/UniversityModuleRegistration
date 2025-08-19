@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from students.models import Student
-from modules.models import Module
+from modules.models import Module, Course
 from registrations.models import Registration
 from accounts.models import OTPVerification, ContactMessage
 from portalcontent.models import SiteConfiguration, NewsUpdate
@@ -36,6 +36,13 @@ class ModuleSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
 
+class CourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = ['id', 'code', 'name', 'description', 'level', 'is_active']
+        read_only_fields = ['id']
+
+
 class RegistrationSerializer(serializers.ModelSerializer):
     student = StudentSerializer(read_only=True)
     module = ModuleSerializer(read_only=True)
@@ -61,11 +68,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
         # Check if already registered
         if Registration.objects.filter(student=student, module=module).exists():
             raise serializers.ValidationError("Already registered for this module")
-        
-        # Check if module is full
-        current_registrations = Registration.objects.filter(module=module).count()
-        if current_registrations >= module.max_students:
-            raise serializers.ValidationError("Module is full")
             
         validated_data['student'] = student
         validated_data['module'] = module

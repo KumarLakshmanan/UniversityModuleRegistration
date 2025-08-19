@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
-from modules.models import Module
+from modules.models import Module, Course
 from students.models import Student
 from registrations.models import Registration
 from portalcontent.models import NewsUpdate
@@ -66,7 +66,13 @@ class APIAuthenticationTestCase(APITestCase):
 class ModuleAPITestCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
+        self.course = Course.objects.create(
+            name='Computer Science',
+            code='CS_MASTERS',
+            description='Master of Computer Science'
+        )
         self.module = Module.objects.create(
+            course=self.course,
             name='Introduction to Programming',
             code='CS101',
             description='Basic programming concepts',
@@ -179,7 +185,13 @@ class StudentAPITestCase(APITestCase):
 class RegistrationAPITestCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
+        self.course = Course.objects.create(
+            name='Computer Science',
+            code='CS_MASTERS',
+            description='Master of Computer Science'
+        )
         self.module = Module.objects.create(
+            course=self.course,
             name='Test Module',
             code='CS101',
             description='Test module',
@@ -378,7 +390,13 @@ class StatsAPITestCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         # Create test data
+        self.course = Course.objects.create(
+            name='Computer Science',
+            code='CS_MASTERS',
+            description='Master of Computer Science'
+        )
         self.module = Module.objects.create(
+            course=self.course,
             name='Test Module',
             code='CS101',
             description='Test',
@@ -444,9 +462,17 @@ class APIPerformanceTestCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         
+        # Create a course first
+        self.course = Course.objects.create(
+            name='Computer Science',
+            code='CS_MASTERS',
+            description='Master of Computer Science'
+        )
+        
         # Create multiple modules
         for i in range(50):
             Module.objects.create(
+                course=self.course,
                 name=f'Module {i}',
                 code=f'CS{i:03d}',
                 description=f'Description {i}',

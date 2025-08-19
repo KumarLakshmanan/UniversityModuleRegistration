@@ -7,6 +7,7 @@ app_name = 'api'
 # Create router for ViewSets
 router = DefaultRouter()
 router.register(r'modules', views.ModuleViewSet)
+router.register(r'courses', views.CourseViewSet)
 router.register(r'students', views.StudentViewSet)
 router.register(r'registrations', views.RegistrationViewSet)
 router.register(r'contact-messages', views.ContactMessageViewSet)

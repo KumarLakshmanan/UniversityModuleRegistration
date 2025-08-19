@@ -11,6 +11,8 @@ from django.utils.html import strip_tags
 from django.conf import settings
 from django.utils import timezone
 from django.http import JsonResponse
+from django.contrib.auth import views as auth_views
+from django.urls import reverse_lazy
 import random
 import string
 
@@ -272,3 +274,50 @@ def admin_login_blocked(request):
     """Block admin login via /auth/login/ - redirect to unauthorized page"""
     messages.warning(request, 'Admin login via this URL is not allowed. Please use the admin panel directly.')
     return redirect('portalcontent:unauthorized')
+
+
+class CustomPasswordResetView(auth_views.PasswordResetView):
+    """Custom password reset view that sends HTML emails"""
+    template_name = 'accounts/password_reset.html'
+    email_template_name = 'emails/password_reset_email.html'
+    html_email_template_name = 'emails/password_reset_email.html'  # Use same template for HTML
+    success_url = reverse_lazy('accounts:password_reset_done')
+    
+    def send_mail(self, subject_template_name, email_template_name,
+                  context, from_email, to_email, html_email_template_name=None):
+        """Override to ensure HTML email is sent"""
+        subject = render_to_string(subject_template_name or 'emails/password_reset_subject.txt', context)
+        subject = ''.join(subject.splitlines())  # Remove newlines
+        
+        # Render HTML email
+        html_email = render_to_string(html_email_template_name or email_template_name, context)
+        
+        # Create plain text version
+        plain_email = strip_tags(html_email)
+        
+        send_mail(
+            subject=subject,
+            message=plain_email,
+            from_email=from_email,
+            recipient_list=[to_email],
+            html_message=html_email,
+        )
+
+
+class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    """Custom password reset confirm view with better error handling"""
+    template_name = 'accounts/password_reset_confirm.html'
+    success_url = reverse_lazy('accounts:password_reset_complete')
+    
+    def form_valid(self, form):
+        """Override to add success message"""
+        response = super().form_valid(form)
+        messages.success(self.request, 'Your password has been successfully changed!')
+        return response
+    
+    def form_invalid(self, form):
+        """Override to add error messages"""
+        for field, errors in form.errors.items():
+            for error in errors:
+                messages.error(self.request, f"{error}")
+        return super().form_invalid(form)

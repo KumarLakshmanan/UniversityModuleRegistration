@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.urls import reverse
-from modules.models import Module
+from modules.models import Module, Course
 from students.models import Student
 from registrations.models import Registration
 
@@ -9,7 +9,13 @@ from registrations.models import Registration
 class ModulesTestCase(TestCase):
     def setUp(self):
         self.client = Client()
+        self.course = Course.objects.create(
+            name='Computer Science',
+            code='CS_MASTERS',
+            description='Master of Computer Science'
+        )
         self.module = Module.objects.create(
+            course=self.course,
             name='Introduction to Programming',
             code='CS101',
             description='Basic programming concepts',
@@ -41,7 +47,13 @@ class ModulesTestCase(TestCase):
 class ModuleModelTestCase(TestCase):
     def test_module_creation(self):
         """Test creating a module"""
+        course = Course.objects.create(
+            name='Computer Science',
+            code='CS_MASTERS',
+            description='Master of Computer Science'
+        )
         module = Module.objects.create(
+            course=course,
             name='Data Structures',
             code='CS201',
             description='Study of data structures',
@@ -54,7 +66,13 @@ class ModuleModelTestCase(TestCase):
 
     def test_module_slug_generation(self):
         """Test that module code works as slug"""
+        course = Course.objects.create(
+            name='Computer Science',
+            code='CS_MASTERS',
+            description='Master of Computer Science'
+        )
         module = Module.objects.create(
+            course=course,
             name='Advanced Data Structures',
             code='CS301',
             description='Advanced study of data structures',
@@ -68,7 +86,13 @@ class ModuleModelTestCase(TestCase):
 class ModuleViewsTestCase(TestCase):
     def setUp(self):
         self.client = Client()
+        self.course = Course.objects.create(
+            name='Computer Science',
+            code='CS_MASTERS',
+            description='Master of Computer Science'
+        )
         self.module = Module.objects.create(
+            course=self.course,
             name='Test Module',
             code='CS101',
             description='Test module description',
@@ -83,5 +107,5 @@ class ModuleViewsTestCase(TestCase):
 
     def test_module_detail_page_renders(self):
         """Test that module detail page renders correctly"""
-        response = self.client.get(reverse('modules:module_detail', args=[self.module.pk]))
+        response = self.client.get(reverse('modules:module_detail', args=[self.module.code]))
         self.assertEqual(response.status_code, 200)

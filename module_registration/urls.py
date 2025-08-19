@@ -1,8 +1,8 @@
 """
-URL configuration for university_system project.
+URL configuration for module_registration project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
+    https://docs.djangoproject.com/en/4.2/topics/http/urls/
 Examples:
 Function views
     1. Add an import:  from my_app import views
@@ -23,17 +23,18 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     
     # Main site URLs
-    path('', include('portalcontent.urls')),
+    path('', include('core.urls')),
     
-    # Account management URLs
+    # Authentication URLs (top-level)
     path('', include('accounts.urls')),
-    path('auth/', include('students.urls')),  # Auth URLs for login/logout
     
-    # Course URLs (main functionality)
+    # Student URLs (includes auth)
+    path('students/', include('students.urls')),
+    path('auth/', include('students.urls')),  # Alternative auth path
+    
+    # Module/Course URLs (now primarily courses)
     path('courses/', include('modules.urls')),
-    
-    # Registration URLs
-    path('registrations/', include('registrations.urls')),
+    path('modules/', include('modules.urls')),  # Keep for backward compatibility
     
     # API URLs
     path('api/', include('api.urls')),

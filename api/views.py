@@ -10,20 +10,17 @@ import random
 from django.utils import timezone
 
 from students.models import Student
-from modules.models import Module
+from modules.models import Module, Course
 from registrations.models import Registration
 from accounts.models import OTPVerification, ContactMessage
 from portalcontent.models import SiteConfiguration, NewsUpdate
 
 from .serializers import (
-    UserSerializer, StudentSerializer, ModuleSerializer, 
-    RegistrationSerializer, OTPVerificationSerializer,
-    ContactMessageSerializer, SiteConfigurationSerializer,
-    NewsUpdateSerializer, UserRegistrationSerializer,
-    StudentProfileSerializer
+    UserSerializer, StudentSerializer, ModuleSerializer, CourseSerializer,
+    RegistrationSerializer, OTPVerificationSerializer, 
+    ContactMessageSerializer, SiteConfigurationSerializer, 
+    NewsUpdateSerializer, UserRegistrationSerializer, StudentProfileSerializer
 )
-
-
 class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
@@ -59,6 +56,20 @@ class ModuleViewSet(viewsets.ModelViewSet):
     
     def get_permissions(self):
         # Public can view modules, only staff can create, update, delete
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAuthenticated]
+            # You might want to add custom staff permission here
+        return [permission() for permission in permission_classes]
+
+
+class CourseViewSet(viewsets.ModelViewSet):
+    queryset = Course.objects.filter(is_active=True)
+    serializer_class = CourseSerializer
+    
+    def get_permissions(self):
+        # Public can view courses, only staff can create, update, delete
         if self.action in ['list', 'retrieve']:
             permission_classes = [AllowAny]
         else:
@@ -413,12 +424,17 @@ def dashboard_stats(request):
         student = Student.objects.get(user=request.user)
         registrations = Registration.objects.filter(student=student)
         
+        # Calculate total credits from registered modules  
+        total_credits = 0
+        for reg in registrations.filter(status__in=['enrolled', 'completed']).select_related('module'):
+            total_credits += reg.module.credits
+        
         stats = {
             'total_registrations': registrations.count(),
             'active_registrations': registrations.filter(status='enrolled').count(),
             'completed_modules': registrations.filter(status='completed').count(),
             'pending_registrations': registrations.filter(status='pending').count(),
-            'total_credits': sum(reg.module.credits for reg in registrations.filter(status__in=['enrolled', 'completed'])),
+            'total_credits': total_credits,
         }
         
         return Response(stats)
@@ -570,6 +586,7 @@ def get_site_stats(request):
     """Get site statistics"""
     stats = {
         'students': Student.objects.count(),
+        'courses': Course.objects.count(),
         'modules': Module.objects.count(),
         'registrations': Registration.objects.count(),
         'satisfaction': '98%'  # Placeholder statistic
@@ -640,11 +657,15 @@ class DashboardView(views.APIView):
             student = Student.objects.get(user=request.user)
             
             # Get student registrations
-            registrations = Registration.objects.filter(student=student)
+            registrations = Registration.objects.filter(student=student).select_related('module')
             reg_serializer = RegistrationSerializer(registrations, many=True)
             
-            # Get stats
-            total_credits = sum(reg.module.credits for reg in registrations if reg.status in ['enrolled', 'completed'])
+            # Get stats - calculate total credits from courses
+            total_credits = 0
+            for reg in registrations:
+                if reg.status in ['enrolled', 'completed']:
+                    total_credits += reg.module.credits
+            
             pending_registrations = registrations.filter(status='pending').count()
             completed_modules = registrations.filter(status='completed').count()
             
@@ -692,39 +713,40 @@ class MyModulesView(views.APIView):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])  
 def register_for_module(request, module_id):
     """Register current user for a module"""
     try:
         module = Module.objects.get(id=module_id, is_active=True)
-        student = Student.objects.get(user=request.user)
-        
-        # Check if already registered
-        if Registration.objects.filter(student=student, module=module).exists():
-            return Response(
-                {'error': 'You are already registered for this module'}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        # Create registration
-        registration = Registration.objects.create(
-            student=student,
-            module=module,
-            status='enrolled'
-        )
-        
-        serializer = RegistrationSerializer(registration)
-        return Response(serializer.data)
     except Module.DoesNotExist:
-        return Response(
-            {'error': 'Module not found or not available'}, 
-            status=status.HTTP_404_NOT_FOUND
-        )
+        return Response({
+            'success': False, 
+            'message': 'Module not found or not available'
+        }, status=404)
+    
+    try:
+        student = Student.objects.get(user=request.user)
     except Student.DoesNotExist:
-        return Response(
-            {'error': 'Student profile not found'}, 
-            status=status.HTTP_404_NOT_FOUND
-        )
+        return Response({
+            'success': False, 
+            'message': 'Student profile not found'
+        }, status=404)
+    
+    # Check if already registered
+    if Registration.objects.filter(student=student, module=module).exists():
+        return Response({
+            'success': False, 
+            'message': 'You are already registered for this module'
+        }, status=400)
+    
+    # Create registration
+    Registration.objects.create(
+        student=student,
+        module=module,
+        status='enrolled'
+    )
+    
+    return Response({'success': True, 'message': 'Successfully registered for module'})
 
 
 @api_view(['POST'])
@@ -733,27 +755,29 @@ def unregister_from_module(request, module_id):
     """Unregister current user from a module"""
     try:
         module = Module.objects.get(id=module_id)
-        student = Student.objects.get(user=request.user)
-        
-        try:
-            registration = Registration.objects.get(student=student, module=module)
-            registration.delete()
-            return Response({'success': True, 'message': 'Successfully unregistered from module'})
-        except Registration.DoesNotExist:
-            return Response(
-                {'error': 'You are not registered for this module'}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
     except Module.DoesNotExist:
-        return Response(
-            {'error': 'Module not found'}, 
-            status=status.HTTP_404_NOT_FOUND
-        )
+        return Response({
+            'success': False, 
+            'message': 'Module not found'
+        }, status=404)
+    
+    try:
+        student = Student.objects.get(user=request.user)
     except Student.DoesNotExist:
-        return Response(
-            {'error': 'Student profile not found'}, 
-            status=status.HTTP_404_NOT_FOUND
-        )
+        return Response({
+            'success': False, 
+            'message': 'Student profile not found'
+        }, status=404)
+    
+    try:
+        registration = Registration.objects.get(student=student, module=module)
+        registration.delete()
+        return Response({'success': True, 'message': 'Successfully unregistered from module'})
+    except Registration.DoesNotExist:
+        return Response({
+            'success': False, 
+            'message': 'You are not registered for this module'
+        }, status=400)
 
 
 @api_view(['POST'])

@@ -16,7 +16,7 @@
                 </div>
                 <div class="flex items-center space-x-4">
                     <a href="{% url 'portalcontent:home' %}" class="hover:text-red-200">Home</a>
-                    <a href="{% url 'modules:module_list' %}" class="hover:text-red-200">Modules</a>
+                    <a href="{% url 'modules:course_list' %}" class="hover:text-red-200">Courses</a>
                     <a href="{% url 'portalcontent:about' %}" class="hover:text-red-200">About</a>
                     <a href="{% url 'portalcontent:contact' %}" class="hover:text-red-200">Contact</a>
                     {% if user.is_authenticated %}

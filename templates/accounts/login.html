@@ -42,7 +42,12 @@
         </div>
     </form>
 
-    <div class="mt-6 text-center">
+    <div class="mt-6 text-center space-y-2">
+        <p class="text-sm text-gray-600">
+            <a href="{% url 'accounts:password_reset' %}" class="font-medium text-red-600 hover:text-red-500">
+                Forgot your password?
+            </a>
+        </p>
         <p class="text-sm text-gray-600">
             Don't have an account? 
             <a href="{% url 'accounts:register' %}" class="font-medium text-red-600 hover:text-red-500">

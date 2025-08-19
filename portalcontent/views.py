@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_http_methods
 from accounts.models import ContactMessage
 from .models import SiteConfiguration, NewsUpdate
-from modules.models import Module
+from modules.models import Course, Module
 from students.models import Student
 from registrations.models import Registration
 import json
@@ -18,6 +18,7 @@ def home_view(request):
     # Add stats for the home page
     stats = {
         'total_students': Student.objects.count(),
+        'total_courses': Course.objects.count(),
         'total_modules': Module.objects.count(),
         'total_registrations': Registration.objects.count(),
     }

@@ -91,7 +91,7 @@ import os
 try:
     import MySQLdb
     # Try to connect to MariaDB
-    MySQLdb.connect(host='localhost', user='root', password='', db='test')
+    MySQLdb.connect(host='localhost', user='root', password='', db='module_registration_v2')
     # If successful, use MariaDB
     DATABASES = {
         'default': {

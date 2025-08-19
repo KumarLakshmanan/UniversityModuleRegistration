@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from .models import Registration
 from students.models import Student
-from modules.models import Module
+from modules.models import Module, Course
 
 
 def is_staff_member(user):
