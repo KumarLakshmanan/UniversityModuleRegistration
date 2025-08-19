@@ -24,10 +24,10 @@
             <!-- Desktop Navigation -->
             <ul class="right hide-on-med-and-down">
                 <li><a href="{% url 'sitecore:home' %}">Home</a></li>
-                <li><a href="{% url 'modules:list' %}">Modules</a></li>
+                <li><a href="{% url 'modules:course_list' %}">Courses</a></li>
                 
                 {% if user.is_authenticated %}
-                    <li><a href="{% url 'registrations:my_modules' %}">My Modules</a></li>
+                    <li><a href="{% url 'registrations:my_modules' %}">My Courses</a></li>
                     <li><a href="{% url 'students:dashboard' %}">Dashboard</a></li>
                     <li><a href="{% url 'students:profile' %}">Profile</a></li>
                     <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
@@ -42,10 +42,10 @@
             <!-- Mobile Navigation -->
             <ul id="nav-mobile" class="sidenav">
                 <li><a href="{% url 'sitecore:home' %}">Home</a></li>
-                <li><a href="{% url 'modules:list' %}">Modules</a></li>
+                <li><a href="{% url 'modules:course_list' %}">Courses</a></li>
                 
                 {% if user.is_authenticated %}
-                    <li><a href="{% url 'registrations:my_modules' %}">My Modules</a></li>
+                    <li><a href="{% url 'registrations:my_modules' %}">My Courses</a></li>
                     <li><a href="{% url 'students:dashboard' %}">Dashboard</a></li>
                     <li><a href="{% url 'students:profile' %}">Profile</a></li>
                     <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
@@ -93,7 +93,7 @@
                     <h5 class="white-text">Quick Links</h5>
                     <ul>
                         <li><a class="white-text" href="{% url 'sitecore:home' %}">Home</a></li>
-                        <li><a class="white-text" href="{% url 'modules:list' %}">Modules</a></li>
+                        <li><a class="white-text" href="{% url 'modules:course_list' %}">Courses</a></li>
                         <li><a class="white-text" href="{% url 'sitecore:about' %}">About</a></li>
                         <li><a class="white-text" href="{% url 'sitecore:contact' %}">Contact</a></li>
                     </ul>
@@ -123,6 +123,12 @@
 
     <!-- JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    
+    <!-- CSRF Token for AJAX requests -->
+    <script>
+        window.csrfToken = '{{ csrf_token }}';
+    </script>
+    
     <script src="{% static 'js/main.js' %}"></script>
     
     {% block extra_js %}{% endblock %}

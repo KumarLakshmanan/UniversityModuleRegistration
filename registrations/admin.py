@@ -32,7 +32,7 @@ class RegistrationAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         """Optimize queryset with select_related."""
         return super().get_queryset(request).select_related(
-            'student__user', 'module'
+            'student__user', 'module__course'
         )
     
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -40,5 +40,5 @@ class RegistrationAdmin(admin.ModelAdmin):
         if db_field.name == "student":
             kwargs["queryset"] = db_field.related_model.objects.select_related('user')
         elif db_field.name == "module":
-            kwargs["queryset"] = db_field.related_model.objects.filter(is_active=True)
+            kwargs["queryset"] = db_field.related_model.objects.filter(status='active')
         return super().formfield_for_foreignkey(db_field, request, **kwargs)

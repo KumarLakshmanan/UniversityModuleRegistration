@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from rest_framework.test import APIClient, APITestCase as RestAPITestCase
 from rest_framework import status
 from students.models import Student
-from modules.models import Module
+from modules.models import Course, Module
 from registrations.models import Registration
 from sitecore.models import ContactMessage, SystemStats
 import json
@@ -39,8 +39,17 @@ class APITestCase(TestCase):
             password='AdminPass123!'
         )
         
+        # Create test course
+        self.course = Course.objects.create(
+            title='Computer Science Program',
+            course_code='CS-PROG',
+            description='Comprehensive computer science program',
+            status='active'
+        )
+        
         # Create test modules
         self.module1 = Module.objects.create(
+            course=self.course,
             code='CS101',
             name='Introduction to Computer Science',
             description='Basic concepts of computer science and programming.',
@@ -51,6 +60,7 @@ class APITestCase(TestCase):
         )
         
         self.module2 = Module.objects.create(
+            course=self.course,
             code='MATH201',
             name='Advanced Mathematics',
             description='Advanced mathematical concepts and applications.',

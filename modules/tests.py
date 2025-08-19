@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
-from .models import Module
+from .models import Course, Module
 from students.models import Student
 from registrations.models import Registration
 
@@ -26,8 +26,24 @@ class ModulesViewsTestCase(TestCase):
             is_verified=True
         )
         
+        # Create test courses
+        self.course1 = Course.objects.create(
+            title='Computer Science Program',
+            course_code='CS-PROG',
+            description='Comprehensive computer science program',
+            status='active'
+        )
+        
+        self.course2 = Course.objects.create(
+            title='Mathematics Program',
+            course_code='MATH-PROG',
+            description='Advanced mathematics program',
+            status='active'
+        )
+        
         # Create test modules
         self.module1 = Module.objects.create(
+            course=self.course1,
             code='CS101',
             name='Introduction to Computer Science',
             description='Basic concepts of computer science and programming.',
@@ -38,6 +54,7 @@ class ModulesViewsTestCase(TestCase):
         )
         
         self.module2 = Module.objects.create(
+            course=self.course2,
             code='MATH201',
             name='Advanced Mathematics',
             description='Advanced mathematical concepts and applications.',
@@ -48,6 +65,7 @@ class ModulesViewsTestCase(TestCase):
         )
         
         self.inactive_module = Module.objects.create(
+            course=self.course1,
             code='OLD101',
             name='Inactive Module',
             description='This module is inactive.',
@@ -58,28 +76,30 @@ class ModulesViewsTestCase(TestCase):
         )
     
     def test_module_list_view(self):
-        """Test module list view."""
+        """Test module list view - now redirects to course list."""
         response = self.client.get(reverse('modules:list'))
+        self.assertEqual(response.status_code, 302)  # Redirects to course list
+        
+        # Test course list instead
+        response = self.client.get(reverse('modules:course_list'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Module Catalog')
-        self.assertContains(response, self.module1.name)
-        self.assertContains(response, self.module2.name)
-        # Should not show inactive modules
-        self.assertNotContains(response, self.inactive_module.name)
+        self.assertContains(response, 'Course Catalog')
+        self.assertContains(response, self.course1.title)
+        self.assertContains(response, self.course2.title)
     
     def test_module_list_search(self):
-        """Test module list search functionality."""
-        response = self.client.get(reverse('modules:list'), {'search': 'Computer'})
+        """Test course list search functionality."""
+        response = self.client.get(reverse('modules:course_list'), {'search': 'Computer'})
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.module1.name)
-        self.assertNotContains(response, self.module2.name)
+        self.assertContains(response, self.course1.title)
+        self.assertNotContains(response, self.course2.title)
     
     def test_module_list_category_filter(self):
-        """Test module list category filtering."""
-        response = self.client.get(reverse('modules:list'), {'category': 'core'})
+        """Test course list available filter."""
+        response = self.client.get(reverse('modules:course_list'), {'available': 'true'})
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.module2.name)
-        self.assertContains(response, self.module1.name)  # Both are core modules
+        self.assertContains(response, self.course1.title)
+        self.assertContains(response, self.course2.title)  # Both are available
     
     def test_module_detail_view(self):
         """Test module detail view."""
@@ -99,13 +119,13 @@ class ModulesViewsTestCase(TestCase):
         self.client.login(username='testuser', password='TestPass123!')
         response = self.client.get(reverse('modules:detail', kwargs={'code': self.module1.code}))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Register Now')
+        self.assertContains(response, 'Register for Course')
     
     def test_module_detail_registration_button_unauthenticated(self):
         """Test registration button visibility for unauthenticated users."""
         response = self.client.get(reverse('modules:detail', kwargs={'code': self.module1.code}))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Login')
+        self.assertContains(response, 'Login to Register')
     
     def test_module_detail_already_registered(self):
         """Test module detail view when already registered."""
@@ -119,7 +139,7 @@ class ModulesViewsTestCase(TestCase):
         self.client.login(username='testuser', password='TestPass123!')
         response = self.client.get(reverse('modules:detail', kwargs={'code': self.module1.code}))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Registered')
+        self.assertContains(response, 'Unregister from Course')
     
     def test_module_detail_context_data(self):
         """Test module detail view context data."""
@@ -128,10 +148,12 @@ class ModulesViewsTestCase(TestCase):
         
         context = response.context
         self.assertIn('module', context)
-        self.assertIn('enrolled_students', context)
+        self.assertIn('course_modules', context)
+        self.assertIn('course', context)
         self.assertIn('user_registered', context)
         
         self.assertEqual(context['module'], self.module1)
+        self.assertEqual(context['course'], self.course1)
         self.assertFalse(context['user_registered'])  # No registration yet
     
     def test_module_registration_ajax_authenticated(self):
@@ -212,11 +234,18 @@ class ModulesViewsTestCase(TestCase):
         self.assertFalse(registration.is_active)
     
     def test_module_list_pagination(self):
-        """Test module list pagination."""
-        # Create many modules to test pagination
+        """Test course list pagination."""
+        # Create many courses to test pagination
         for i in range(15):
+            course = Course.objects.create(
+                title=f'Test Course {i}',
+                course_code=f'TEST{i:03d}',
+                description='Test description',
+                status='active'
+            )
             Module.objects.create(
-                code=f'TEST{i:03d}',
+                course=course,
+                code=f'MOD{i:03d}',
                 name=f'Test Module {i}',
                 description='Test description',
                 credits=3,
@@ -225,7 +254,7 @@ class ModulesViewsTestCase(TestCase):
                 status='active'
             )
         
-        response = self.client.get(reverse('modules:list'))
+        response = self.client.get(reverse('modules:course_list'))
         self.assertEqual(response.status_code, 200)
         
         # Should show pagination
@@ -247,7 +276,16 @@ class ModuleModelTestCase(TestCase):
             is_verified=True
         )
         
+        # Create test course
+        self.course = Course.objects.create(
+            title='Computer Science Program',
+            course_code='CS-PROG',
+            description='Comprehensive computer science program',
+            status='active'
+        )
+        
         self.module = Module.objects.create(
+            course=self.course,
             code='CS101',
             name='Computer Science 101',
             description='Basic computer science course',
@@ -266,7 +304,7 @@ class ModuleModelTestCase(TestCase):
     
     def test_module_string_representation(self):
         """Test module __str__ method."""
-        expected = 'CS101 - Computer Science 101'
+        expected = 'CS-PROG-CS101 - Computer Science 101'
         self.assertEqual(str(self.module), expected)
     
     def test_module_is_registration_open_property(self):
@@ -276,6 +314,7 @@ class ModuleModelTestCase(TestCase):
         
         # Module with closed registration should not be open
         closed_module = Module.objects.create(
+            course=self.course,
             code='CLOSED101',
             name='Closed Module',
             description='Closed module',
@@ -357,7 +396,8 @@ class ModuleModelTestCase(TestCase):
         
         with self.assertRaises(IntegrityError):
             Module.objects.create(
-                code='CS101',  # Duplicate code
+                course=self.course,
+                code='CS101',  # Duplicate code within same course
                 name='Another CS Course',
                 description='Another course',
                 credits=4,

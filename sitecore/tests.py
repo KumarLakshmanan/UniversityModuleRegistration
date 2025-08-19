@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.core import mail
 from .models import ContactMessage, SystemStats
 from students.models import Student
-from modules.models import Module
+from modules.models import Course, Module
 from registrations.models import Registration
 from django.contrib.auth.models import User
 
@@ -132,7 +132,16 @@ class SitecoreViewsTestCase(TestCase):
         )
         student = Student.objects.create(user=user, is_verified=True)
         
+        # Create test course
+        course = Course.objects.create(
+            title='Computer Science Program',
+            course_code='CS-PROG',
+            description='Comprehensive computer science program',
+            status='active'
+        )
+        
         module = Module.objects.create(
+            course=course,
             code='CS101',
             name='Computer Science 101',
             description='Basic CS course',
@@ -253,8 +262,17 @@ class SystemStatsModelTestCase(TestCase):
         )
         self.student2 = Student.objects.create(user=self.user2, is_verified=True)
         
+        # Create test course
+        self.course = Course.objects.create(
+            title='Computer Science Program',
+            course_code='CS-PROG',
+            description='Comprehensive computer science program',
+            status='active'
+        )
+        
         # Create test modules
         self.module1 = Module.objects.create(
+            course=self.course,
             code='CS101',
             name='Computer Science 101',
             description='Basic CS course',
@@ -264,6 +282,7 @@ class SystemStatsModelTestCase(TestCase):
         )
         
         self.module2 = Module.objects.create(
+            course=self.course,
             code='MATH101',
             name='Mathematics 101',
             description='Basic Math course',
@@ -324,6 +343,7 @@ class SystemStatsModelTestCase(TestCase):
         """Test system stats with inactive modules and withdrawn registrations."""
         # Create inactive module
         inactive_module = Module.objects.create(
+            course=self.course,
             code='OLD101',
             name='Old Course',
             description='Inactive course',

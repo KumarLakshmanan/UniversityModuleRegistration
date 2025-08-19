@@ -1,0 +1,12 @@
+in the frontend
+- in courses page only show the courses.
+- and when clicking show the modules in that course. with the register and unregister button. and etc.
+
+course table only needs to have the title and description with the relationship to modules.
+
+and on clicking the courses card it will open the list of modules in that course.
+and the user can only need to register to that module. not the course.
+
+so we need two list view pages
+1-> courses list
+2-> modules list (for a specific course)

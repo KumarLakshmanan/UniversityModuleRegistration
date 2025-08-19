@@ -191,25 +191,34 @@ function registerForModule(moduleCode, button) {
             'X-CSRFToken': getCSRFToken()
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
-        console.log(data);
-        if (data.status == "enrolled") {
+        if (data.status === "enrolled" || data.student || data.id) {
             showMessage('Successfully registered for module!', 'success');
             setTimeout(() => {
-                // Optionally, redirect to the module details page or refresh the page
                 window.location.reload();
-            }, 100);
+            }, 1000);
         } else {
-            console.log(data['success']);
             showMessage(data.message || 'Error registering for module.', 'error');
             button.disabled = false;
             button.textContent = originalText;
         }
     })
+    .catch(error => {
+        console.error('Registration error:', error);
+        showMessage('Error registering for module. Please try again.', 'error');
+        button.disabled = false;
+        button.textContent = originalText;
+    });
 }
 
 function unregisterFromModule(moduleCode, button) {
+    // Show confirmation dialog only once
     if (!confirm('Are you sure you want to unregister from this module?')) {
         return;
     }
@@ -225,14 +234,18 @@ function unregisterFromModule(moduleCode, button) {
             'X-CSRFToken': getCSRFToken()
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
-        if (data.status == "unregistered") {
+        if (data.status === "unregistered") {
             showMessage('Successfully unregistered from module!', 'success');
             setTimeout(() => {
-                // Optionally, redirect to the module details page or refresh the page
                 window.location.reload();
-            }, 100);
+            }, 1000);
         } else {
             showMessage(data.message || 'Error unregistering from module.', 'error');
             button.disabled = false;
@@ -240,7 +253,8 @@ function unregisterFromModule(moduleCode, button) {
         }
     })
     .catch(error => {
-        showMessage('Error unregistering from module.', 'error');
+        console.error('Unregistration error:', error);
+        showMessage('Error unregistering from module. Please try again.', 'error');
         button.disabled = false;
         button.textContent = originalText;
     });
@@ -281,6 +295,12 @@ function createMessagesContainer() {
 }
 
 function getCSRFToken() {
+    // First try to get from window variable set in template
+    if (window.csrfToken) {
+        return window.csrfToken;
+    }
+    
+    // Fallback to cookie method
     const cookie = document.cookie.split(';').find(c => c.trim().startsWith('csrftoken='));
     return cookie ? cookie.split('=')[1] : '';
 }

@@ -5,7 +5,7 @@ from django.utils import timezone
 from datetime import timedelta
 from .models import Registration
 from students.models import Student
-from modules.models import Module
+from modules.models import Course, Module
 
 
 class RegistrationsViewsTestCase(TestCase):
@@ -26,8 +26,17 @@ class RegistrationsViewsTestCase(TestCase):
             is_verified=True
         )
         
+        # Create test course
+        self.course = Course.objects.create(
+            title='Computer Science Program',
+            course_code='CS-PROG',
+            description='Comprehensive computer science program',
+            status='active'
+        )
+        
         # Create test modules
         self.module1 = Module.objects.create(
+            course=self.course,
             code='CS101',
             name='Computer Science 101',
             description='Basic computer science course',
@@ -38,6 +47,7 @@ class RegistrationsViewsTestCase(TestCase):
         )
         
         self.module2 = Module.objects.create(
+            course=self.course,
             code='MATH201',
             name='Advanced Mathematics',
             description='Advanced mathematical concepts',
@@ -110,13 +120,14 @@ class RegistrationsViewsTestCase(TestCase):
         response = self.client.get(reverse('registrations:my_modules'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'No Modules Registered')
-        self.assertContains(response, 'Browse Modules')
+        self.assertContains(response, 'Browse Courses')
     
     def test_my_modules_view_pagination(self):
         """Test my modules view pagination."""
         # Create many registrations to test pagination
         for i in range(15):
             module = Module.objects.create(
+                course=self.course,
                 code=f'TEST{i:03d}',
                 name=f'Test Module {i}',
                 description='Test description',
@@ -142,6 +153,7 @@ class RegistrationsViewsTestCase(TestCase):
         """Test that only active registrations are shown."""
         # Create inactive registration
         inactive_module = Module.objects.create(
+            course=self.course,
             code='INACTIVE',
             name='Inactive Module',
             description='Inactive module',
@@ -193,7 +205,16 @@ class RegistrationModelTestCase(TestCase):
             is_verified=True
         )
         
+        # Create test course
+        self.course = Course.objects.create(
+            title='Computer Science Program',
+            course_code='CS-PROG',
+            description='Comprehensive computer science program',
+            status='active'
+        )
+        
         self.module = Module.objects.create(
+            course=self.course,
             code='CS101',
             name='Computer Science 101',
             description='Basic computer science course',
@@ -225,7 +246,7 @@ class RegistrationModelTestCase(TestCase):
             status='enrolled'
         )
         
-        expected = f"{self.student.get_full_name()} - CS101"
+        expected = f"{self.student.get_full_name()} - CS-PROG-CS101"
         self.assertEqual(str(registration), expected)
     
     def test_registration_default_values(self):
@@ -326,6 +347,7 @@ class RegistrationModelTestCase(TestCase):
         
         # Create another module and registration
         module2 = Module.objects.create(
+            course=self.course,
             code='MATH101',
             name='Mathematics 101',
             description='Basic mathematics',

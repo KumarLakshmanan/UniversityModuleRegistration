@@ -45,7 +45,7 @@ class Registration(models.Model):
         unique_together = ('student', 'module')
 
     def __str__(self):
-        return f"{self.student.get_full_name()} - {self.module.code}"
+        return f"{self.student.get_full_name()} - {self.module.full_code}"
 
     def withdraw(self, reason=""):
         """Withdraw the student from the module."""
@@ -66,8 +66,15 @@ class Registration(models.Model):
     @property
     def duration_enrolled(self):
         """Calculate how long the student has been enrolled."""
+        from django.utils import timezone
+        if not self.date_registered:
+            return timezone.timedelta(days=0)
+        
         end_date = self.completion_date or self.withdrawal_date or timezone.now()
-        return end_date - self.date_registered
+        duration = end_date - self.date_registered
+        
+        # Ensure we return at least 0 days
+        return duration if duration.days >= 0 else timezone.timedelta(days=0)
 
     @property
     def can_withdraw(self):

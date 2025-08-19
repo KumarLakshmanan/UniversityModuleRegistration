@@ -84,20 +84,39 @@ WSGI_APPLICATION = 'course_registration.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'module_registration_v3',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '3306',
-        'OPTIONS': {
-            'sql_mode': 'traditional',
-            'init_command': "SET foreign_key_checks = 0;",
+try:
+    import MySQLdb
+    # Try to connect to MariaDB
+    MySQLdb.connect(host='localhost', user='root', password='', db='module_registration_v3')
+    # If successful, use MariaDB
+    DATABASES = {
+        'default': {
+            'ENGINE': 'university_system.db_backends.mysql',
+            'NAME': 'module_registration_v3',
+            'USER': 'root',
+            'PASSWORD': '',
+            'HOST': 'localhost',
+            'PORT': '3306',
+            'OPTIONS': {
+                'sql_mode': 'traditional',
+                'charset': 'utf8mb4',
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            },
+            'TEST': {
+                'CHARSET': 'utf8mb4',
+                'COLLATION': 'utf8mb4_unicode_ci',
+            }
         }
     }
-}
+except:
+    # Fallback to SQLite if MariaDB is not available
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
 
 # Disable database version checking and RETURNING clause for MariaDB 10.4.32
 import django.db.backends.mysql.base

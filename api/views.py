@@ -205,7 +205,8 @@ class ModuleRegisterAPIView(APIView):
             # Create registration
             Registration.objects.create(student=student, module=module)
             
-            return Response({'success': True, 'message': 'Successfully registered for module'})
+            return Response({'success': True, 'message': 'Successfully registered for module'}, 
+                          status=status.HTTP_201_CREATED)
             
         except Module.DoesNotExist:
             return Response({'success': False, 'message': 'Module not found'})
@@ -324,7 +325,7 @@ class ModuleRegistrationAPIView(APIView):
             )
             
             serializer = RegistrationSerializer(registration)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
             
         except Student.DoesNotExist:
             return Response(

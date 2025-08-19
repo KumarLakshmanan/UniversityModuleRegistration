@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from students.models import Student, OTP
-from modules.models import Module
+from modules.models import Course, Module
 from registrations.models import Registration
 from sitecore.models import ContactMessage, SystemStats
 
@@ -47,8 +47,9 @@ class StudentCreateSerializer(serializers.ModelSerializer):
 
 class ModuleSerializer(serializers.ModelSerializer):
     """Serializer for Module model."""
+    full_code = serializers.SerializerMethodField()
+    course_title = serializers.SerializerMethodField()
     enrolled_count = serializers.SerializerMethodField()
-    is_registration_open = serializers.SerializerMethodField()
     can_register = serializers.SerializerMethodField()
     
     class Meta:
@@ -56,8 +57,57 @@ class ModuleSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'code', 'name', 'description', 'credits', 'category',
             'prerequisites', 'status', 'is_available_for_registration', 'max_students',
-            'created_at', 'updated_at',
-            'enrolled_count', 'is_registration_open', 'can_register'
+            'created_at', 'updated_at', 'full_code', 'course_title', 'enrolled_count',
+            'can_register'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+    
+    def get_full_code(self, obj):
+        """Get the full module code including course code."""
+        return obj.full_code
+    
+    def get_course_title(self, obj):
+        """Get the course title."""
+        return obj.course.title
+    
+    def get_enrolled_count(self, obj):
+        """Get the number of students enrolled in this specific module."""
+        from registrations.models import Registration
+        return Registration.objects.filter(module=obj, is_active=True).count()
+    
+    def get_can_register(self, obj):
+        """Check if current user can register for this module."""
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return obj.can_register()
+        
+        try:
+            student = request.user.student_profile
+            from registrations.models import Registration
+            already_registered = Registration.objects.filter(
+                student=student, module=obj, is_active=True
+            ).exists()
+            return obj.can_register() and not already_registered
+        except:
+            return obj.can_register()
+
+
+class CourseSerializer(serializers.ModelSerializer):
+    """Serializer for Course model."""
+    enrolled_count = serializers.SerializerMethodField()
+    total_credits = serializers.SerializerMethodField()
+    module_count = serializers.SerializerMethodField()
+    is_registration_open = serializers.SerializerMethodField()
+    can_register = serializers.SerializerMethodField()
+    modules = ModuleSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = Course
+        fields = [
+            'id', 'course_code', 'title', 'description', 'status', 
+            'is_available_for_registration', 'created_at', 'updated_at',
+            'enrolled_count', 'total_credits', 'module_count', 'is_registration_open', 
+            'can_register', 'modules'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
     
@@ -65,12 +115,20 @@ class ModuleSerializer(serializers.ModelSerializer):
         """Get the number of enrolled students."""
         return obj.enrolled_students_count
     
+    def get_total_credits(self, obj):
+        """Get total credits for this course."""
+        return obj.total_credits
+    
+    def get_module_count(self, obj):
+        """Get number of modules in this course."""
+        return obj.module_count
+    
     def get_is_registration_open(self, obj):
         """Check if registration is currently open."""
         return obj.is_available_for_registration
     
     def get_can_register(self, obj):
-        """Check if current user can register for this module."""
+        """Check if current user can register for this course."""
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
             return False
@@ -84,19 +142,46 @@ class ModuleSerializer(serializers.ModelSerializer):
             return False
 
 
+class CourseListSerializer(serializers.ModelSerializer):
+    """Simplified serializer for course list views."""
+    enrolled_count = serializers.SerializerMethodField()
+    total_credits = serializers.SerializerMethodField()
+    module_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Course
+        fields = [
+            'id', 'course_code', 'title', 'description', 'status', 
+            'enrolled_count', 'total_credits', 'module_count'
+        ]
+    
+    def get_enrolled_count(self, obj):
+        return obj.enrolled_students_count
+    
+    def get_total_credits(self, obj):
+        return obj.total_credits
+    
+    def get_module_count(self, obj):
+        return obj.module_count
+
+
 class ModuleListSerializer(serializers.ModelSerializer):
     """Simplified serializer for module list views."""
-    enrolled_count = serializers.SerializerMethodField()
+    full_code = serializers.SerializerMethodField()
+    course_title = serializers.SerializerMethodField()
     
     class Meta:
         model = Module
         fields = [
             'id', 'code', 'name', 'credits', 'category', 
-            'max_students', 'status', 'enrolled_count'
+            'max_students', 'status', 'full_code', 'course_title'
         ]
     
-    def get_enrolled_count(self, obj):
-        return obj.enrolled_students_count
+    def get_full_code(self, obj):
+        return obj.full_code
+    
+    def get_course_title(self, obj):
+        return obj.course.title
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -104,14 +189,19 @@ class RegistrationSerializer(serializers.ModelSerializer):
     student = StudentSerializer(read_only=True)
     module = ModuleSerializer(read_only=True)
     module_id = serializers.IntegerField(write_only=True)
+    module_credits = serializers.SerializerMethodField()
     
     class Meta:
         model = Registration
         fields = [
             'id', 'student', 'module', 'module_id', 'status', 
-            'date_registered', 'completion_date', 'grade', 'is_active'
+            'date_registered', 'completion_date', 'grade', 'is_active', 'module_credits'
         ]
         read_only_fields = ['id', 'student', 'date_registered', 'completion_date']
+    
+    def get_module_credits(self, obj):
+        """Get credits for this module registration."""
+        return obj.module.credits
     
     def create(self, validated_data):
         """Create a new registration."""
@@ -149,16 +239,20 @@ class RegistrationListSerializer(serializers.ModelSerializer):
     """Simplified serializer for registration list views."""
     module = ModuleListSerializer(read_only=True)
     student_name = serializers.SerializerMethodField()
+    module_credits = serializers.SerializerMethodField()
     
     class Meta:
         model = Registration
         fields = [
             'id', 'module', 'student_name', 'status', 
-            'date_registered', 'grade', 'is_active'
+            'date_registered', 'grade', 'is_active', 'module_credits'
         ]
     
     def get_student_name(self, obj):
         return f"{obj.student.user.first_name} {obj.student.user.last_name}".strip()
+    
+    def get_module_credits(self, obj):
+        return obj.module.credits
 
 
 class ContactMessageSerializer(serializers.ModelSerializer):

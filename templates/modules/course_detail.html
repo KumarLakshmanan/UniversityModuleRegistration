@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ course.title }} - Course Details{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="container section">
+    <!-- Course Header -->
+    <div class="row">
+        <div class="col s12">
+            <div class="card large">
+                <div class="card-image">
+                    <img src="https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=1200&h=400&fit=crop" alt="{{ course.title }}">
+                    <span class="card-title">{{ course.course_code }}</span>
+                </div>
+                <div class="card-content">
+                    <h4>{{ course.title }}</h4>
+                    <p class="flow-text">{{ course.description }}</p>
+                    
+                    <div class="row">
+                        <div class="col s12 m4">
+                            <div class="card-panel green lighten-4">
+                                <h6><i class="material-icons left">book</i>Modules</h6>
+                                <h5>{{ course.module_count }}</h5>
+                            </div>
+                        </div>
+                        <div class="col s12 m4">
+                            <div class="card-panel blue lighten-4">
+                                <h6><i class="material-icons left">stars</i>Total Credits</h6>
+                                <h5>{{ course.total_credits }}</h5>
+                            </div>
+                        </div>
+                        <div class="col s12 m4">
+                            <div class="card-panel purple lighten-4">
+                                <h6><i class="material-icons left">people</i>Enrolled Students</h6>
+                                <h5>{{ enrolled_count }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-action">
+                    <a href="{% url 'modules:course_list' %}" class="btn grey">
+                        <i class="material-icons left">arrow_back</i>Back to Courses
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Modules -->
+    <div class="row">
+        <div class="col s12">
+            <h4>Course Modules</h4>
+            {% if modules %}
+                <div class="row">
+                    {% for module in modules %}
+                        <div class="col s12 m6 l4">
+                            <div class="card module-card">
+                                {% if module.image_url %}
+                                    <div class="card-image">
+                                        <img src="{{ module.image_url }}" alt="{{ module.name }}">
+                                    </div>
+                                {% else %}
+                                    <div class="card-image">
+                                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=300&fit=crop" alt="{{ module.name }}">
+                                    </div>
+                                {% endif %}
+                                <div class="card-content">
+                                    <span class="card-title">{{ module.name }}</span>
+                                    <p><strong>Code:</strong> {{ module.full_code }}</p>
+                                    <p><strong>Credits:</strong> {{ module.credits }}</p>
+                                    <p><strong>Category:</strong> {{ module.get_category_display }}</p>
+                                    <p>{{ module.description|truncatewords:15 }}</p>
+                                    
+                                    {% if module.prerequisites %}
+                                        <div class="chip orange lighten-4">
+                                            <i class="material-icons left">info</i>
+                                            Prerequisites required
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="card-action">
+                                    <a href="{% url 'modules:module_detail' module.code %}" class="btn blue">
+                                        <i class="material-icons left">visibility</i>View Details
+                                    </a>
+                                    {% if user.is_authenticated %}
+                                        {% if module.is_registered %}
+                                            <a href="#" class="btn red right module-unregister-btn" data-module-id="{{ module.id }}">
+                                                <i class="material-icons left">remove_circle</i>Unregister
+                                            </a>
+                                        {% elif module.can_register_check %}
+                                            <a href="#" class="btn green right module-register-btn" data-module-id="{{ module.id }}">
+                                                <i class="material-icons left">add_circle</i>Register
+                                            </a>
+                                        {% else %}
+                                            <span class="btn disabled right">Unavailable</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <a href="{% url 'accounts:login' %}" class="btn green right">
+                                            <i class="material-icons left">login</i>Login
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="card">
+                    <div class="card-content center">
+                        <i class="material-icons large grey-text">book</i>
+                        <h5>No modules available</h5>
+                        <p>This course currently has no active modules.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Enrolled Students -->
+    {% if user.is_authenticated %}
+        <div class="row">
+            <div class="col s12">
+                <h4>Enrolled Students</h4>
+                {% if enrolled_students %}
+                    <div class="collection">
+                        {% for registration in enrolled_students %}
+                            <div class="collection-item avatar">
+                                <i class="material-icons circle green">person</i>
+                                <span class="title">{{ registration.student.get_full_name }}</span>
+                                <p>Module: {{ registration.module.name }} | Registered: {{ registration.date_registered|date:"M d, Y" }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="card">
+                        <div class="card-content center">
+                            <p>No students enrolled in any modules yet.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle module registration
+    const registerBtns = document.querySelectorAll('.module-register-btn');
+    registerBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const moduleId = this.getAttribute('data-module-id');
+            const button = this;
+            
+            fetch(`/modules/${moduleId}/register/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    M.toast({html: data.message, classes: 'green'});
+                    location.reload(); // Reload to update the page state
+                } else {
+                    M.toast({html: data.message, classes: 'red'});
+                }
+            })
+            .catch(error => {
+                M.toast({html: 'An error occurred. Please try again.', classes: 'red'});
+            });
+        });
+    });
+    
+    // Handle module unregistration
+    const unregisterBtns = document.querySelectorAll('.module-unregister-btn');
+    unregisterBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const moduleId = this.getAttribute('data-module-id');
+            const button = this;
+            
+            if (confirm('Are you sure you want to unregister from this module?')) {
+                fetch(`/modules/${moduleId}/unregister/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        M.toast({html: data.message, classes: 'green'});
+                        location.reload(); // Reload to update the page state
+                    } else {
+                        M.toast({html: data.message, classes: 'red'});
+                    }
+                })
+                .catch(error => {
+                    M.toast({html: 'An error occurred. Please try again.', classes: 'red'});
+                });
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

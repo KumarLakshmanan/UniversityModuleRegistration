@@ -23,7 +23,7 @@ class MyModulesView(LoginRequiredMixin, ListView):
         return Registration.objects.filter(
             student=self._student,
             is_active=True
-        ).select_related('module').order_by('-date_registered')
+        ).select_related('module__course').order_by('-date_registered')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

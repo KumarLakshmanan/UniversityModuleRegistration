@@ -26,6 +26,7 @@ class HomeView(TemplateView):
             'total_modules': stats.total_modules,
             'total_registrations': stats.total_registrations,
             'active_modules': stats.active_modules,
+            'active_registrations': stats.active_registrations,
         }
         
         # Get recent modules for homepage

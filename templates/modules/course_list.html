@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block title %}Courses - Course Module Registration System{% endblock %}
+
+{% block content %}
+<div class="container section">
+    <div class="row">
+        <div class="col s12">
+            <h2 class="center green-text">Course Catalog</h2>
+            <p class="center flow-text">Browse and register for academic courses.</p>
+        </div>
+    </div>
+    
+    <!-- Search and Filter Section -->
+    <div class="row search-container">
+        <div class="col s12">
+            <div class="card">
+                <div class="card-content">
+                    <form method="get">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="input-field col s12 m8">
+                                <input id="search" name="search" type="text" value="{{ search_query }}" placeholder="Search courses...">
+                                <label for="search">Search by title, code, or description</label>
+                            </div>
+                            <div class="col s12 m4">
+                                <label>
+                                    <input type="checkbox" name="available" value="1" {% if available_only %}checked{% endif %} class="filled-in" />
+                                    <span>Available only</span>
+                                </label>
+                                <br><br>
+                                <button class="btn green waves-effect waves-light" type="submit">
+                                    <i class="material-icons left">search</i>Search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Courses Grid -->
+    <div class="row search-results">
+        {% if courses %}
+            {% for course in courses %}
+                <div class="col s12 m6 l4">
+                    <div class="card course-card hoverable">
+                        <div class="card-image">
+                            <img src="https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=300&fit=crop" alt="{{ course.title }}">
+                            <span class="card-title">{{ course.course_code }}</span>
+                        </div>
+                        <div class="card-content">
+                            <span class="card-title">{{ course.title }}</span>
+                            <p>{{ course.description|truncatewords:20 }}</p>
+                            
+                            <div class="row" style="margin-bottom: 0;">
+                                <div class="col s6">
+                                    <div class="chip green lighten-4">
+                                        <i class="material-icons left">book</i>
+                                        {{ course.module_count }} modules
+                                    </div>
+                                </div>
+                                <div class="col s6">
+                                    <div class="chip blue lighten-4">
+                                        <i class="material-icons left">stars</i>
+                                        {{ course.total_credits }} credits
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="chip">
+                                <i class="material-icons left">people</i>
+                                {{ course.enrolled_students_count }} students
+                            </div>
+                        </div>
+                        <div class="card-action">
+                            <a href="{% url 'modules:course_detail' course.course_code %}" class="btn green">View Modules</a>
+                            {% if user.is_authenticated %}
+                                {% if course.is_registered %}
+                                    <a href="#" class="btn red unregister-btn right" data-course-id="{{ course.id }}">
+                                        Unregister
+                                    </a>
+                                {% elif course.can_register_check %}
+                                    <a href="#" class="btn green register-btn right" data-course-id="{{ course.id }}">
+                                        Register
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col s12">
+                <div class="card">
+                    <div class="card-content center">
+                        <i class="material-icons large grey-text">search_off</i>
+                        <h5>No courses found</h5>
+                        <p>Try adjusting your search criteria or browse all available courses.</p>
+                        <a href="{% url 'modules:course_list' %}" class="btn green">View All Courses</a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+        <div class="center">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li><a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if available_only %}&available=1{% endif %}"><i class="material-icons">first_page</i></a></li>
+                    <li><a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if available_only %}&available=1{% endif %}"><i class="material-icons">chevron_left</i></a></li>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="active"><a href="#!">{{ num }}</a></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li><a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if available_only %}&available=1{% endif %}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                    <li><a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if available_only %}&available=1{% endif %}"><i class="material-icons">chevron_right</i></a></li>
+                    <li><a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if available_only %}&available=1{% endif %}"><i class="material-icons">last_page</i></a></li>
+                {% endif %}
+            </ul>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const csrftoken = getCookie('csrftoken');
+    
+    // Handle course registration
+    document.querySelectorAll('.register-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const courseId = this.getAttribute('data-course-id');
+            const button = this;
+            
+            fetch(`/modules/courses/${courseId}/register/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    M.toast({html: data.message, classes: 'green'});
+                    button.textContent = 'Unregister';
+                    button.className = 'btn red unregister-btn right';
+                    button.setAttribute('data-course-id', courseId);
+                } else {
+                    M.toast({html: data.message, classes: 'red'});
+                }
+            })
+            .catch(error => {
+                M.toast({html: 'An error occurred. Please try again.', classes: 'red'});
+            });
+        });
+    });
+    
+    // Handle course unregistration
+    document.querySelectorAll('.unregister-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const courseId = this.getAttribute('data-course-id');
+            const button = this;
+            
+            fetch(`/modules/courses/${courseId}/unregister/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    M.toast({html: data.message, classes: 'green'});
+                    button.textContent = 'Register';
+                    button.className = 'btn green register-btn right';
+                    button.setAttribute('data-course-id', courseId);
+                } else {
+                    M.toast({html: data.message, classes: 'red'});
+                }
+            })
+            .catch(error => {
+                M.toast({html: 'An error occurred. Please try again.', classes: 'red'});
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
